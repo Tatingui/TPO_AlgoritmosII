@@ -3,7 +3,7 @@
 /*
  * Clase encargada de la persistencia en memoria RAM.
  * Implementa las estructuras necesarias para cumplir con la eficiencia exigida.
-*/
+ */
 
 package repositorio;
 

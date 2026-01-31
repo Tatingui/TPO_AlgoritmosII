@@ -1,6 +1,6 @@
 package implementaciones;
 
-class Nodo {
-    int info;
-    Nodo sig;
+class Nodo<T> {
+    T info;
+    Nodo<T> sig;
 }

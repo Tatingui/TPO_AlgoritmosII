@@ -1,20 +1,20 @@
 package interfaces;
 
-public interface DiccionarioMultipleTDA {
+public interface DiccionarioMultipleTDA<K, V> {
     void InicializarDiccionario();
 
-    // siempre que el diccionario est´e inicializado
-    void Agregar(int clave, int valor);
+    // Siempre que el diccionario esté inicializado
+    void Agregar(K clave, V valor);
 
-    // siempre que el diccionario est´e inicializado
-    void Eliminar(int clave);
+    // Siempre que el diccionario esté inicializado
+    void Eliminar(K clave);
 
-    // siempre que el diccionario est´e inicializado
-    void EliminarValor(int clave, int valor);
+    // Siempre que el diccionario esté inicializado
+    void EliminarValor(K clave, V valor);
 
-    // siempre que el diccionario est´e inicializado
-    ConjuntoTDA Recuperar(int clave);
+    // Siempre que el diccionario esté inicializado
+    ConjuntoTDA<V> Recuperar(K clave);
 
-    // siempre que el diccionario est´e inicializado
-    ConjuntoTDA Claves();
+    // Siempre que el diccionario esté inicializado
+    ConjuntoTDA<K> Claves();
 }

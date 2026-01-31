@@ -1,18 +1,18 @@
 package interfaces;
 
-public interface DiccionarioSimpleTDA {
-    // siempre que el diccionario est´e inicializado
+public interface DiccionarioSimpleTDA<K, V> {
+    // Siempre que el diccionario esté inicializado
     void InicializarDiccionario();
 
-    // siempre que el diccionario est´e inicializado
-    void Agregar(int clave, int valor);
+    // Siempre que el diccionario esté inicializado
+    void Agregar(K clave, V valor);
 
-    // siempre que el diccionario est´e inicializado
-    void Eliminar(int clave);
+    // Siempre que el diccionario esté inicializado
+    void Eliminar(K clave);
 
-    // siempre que el diccionario est´e inicializado y la clave exista en el mismo
-    int Recuperar(int clave);
+    // Siempre que el diccionario esté inicializado y la clave exista en el mismo
+    V Recuperar(K clave);
 
-    // siempre que el diccionario est´e inicializado
-    ConjuntoTDA Claves();
+    // Siempre que el diccionario esté inicializado
+    ConjuntoTDA<K> Claves();
 }

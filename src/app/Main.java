@@ -8,6 +8,6 @@
  * Orquesta la inicialización de los servicios y lanza la interfaz de usuario.
  */
 
- public static void main(String[] args) {
+public static void main(String[] args) {
 
 }

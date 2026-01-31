@@ -1,13 +1,13 @@
 package interfaces;
 
-public interface ColaTDA {
+public interface ColaTDA<T> {
     void InicializarCola();
 
-    void Acolar(int x);
+    void Acolar(T x);
 
     void Desacolar();
 
     boolean ColaVacia();
 
-    int Primero();
+    T Primero();
 }
