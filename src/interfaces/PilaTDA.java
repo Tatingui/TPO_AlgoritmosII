@@ -1,13 +1,13 @@
 package interfaces;
 
-public interface PilaTDA {
+public interface PilaTDA<T> {
     void InicializarPila();
 
-    void Apilar(int x);
+    void Apilar(T x);
 
     void Desapilar();
 
     boolean PilaVacia();
 
-    int Tope();
+    T Tope();
 }
