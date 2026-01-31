@@ -1,0 +1,64 @@
+{
+  "clientes": [
+    {
+      "nombre": "Alice",
+      "scoring": 95,
+      "siguiendo": ["Bob", "Charlie"],
+      "conexiones": ["Bob", "Charlie", "David"]
+    },
+    {
+      "nombre": "Bob",
+      "scoring": 88,
+      "siguiendo": ["David"],
+      "conexiones": ["Alice", "David"]
+    },
+    {
+      "nombre": "Charlie",
+      "scoring": 80,
+      "siguiendo": [],
+      "conexiones": ["Alice", "Eve"]
+    },
+    {
+      "nombre": "David",
+      "scoring": 92,
+      "siguiendo": ["Alice"],
+      "conexiones": ["Bob", "Alice"]
+    },
+    {
+      "nombre": "Eve",
+      "scoring": 85,
+      "siguiendo": [],
+      "conexiones": ["Charlie"]
+    },
+    {
+      "nombre": "Sergio",
+      "scoring": 99,
+      "siguiendo": ["Bob", "Charlie"],
+      "conexiones": ["Bob", "Charlie", "David"]
+    },
+    {
+      "nombre": "Roberto",
+      "scoring": 77,
+      "siguiendo": ["Sergio","Eve"],
+      "conexiones": ["Alice", "Sergio"]
+    },
+    {
+      "nombre": "Maria",
+      "scoring": 75,
+      "siguiendo": ["Juana","Alice"],
+      "conexiones": ["Alice", "Eve","Juana"]
+    },
+    {
+      "nombre": "Juana",
+      "scoring": 83,
+      "siguiendo": ["Alice"],
+      "conexiones": ["Bob", "Alice"]
+    },
+    {
+      "nombre": "Matias",
+      "scoring": 93,
+      "siguiendo": ["Sergio","Roberto"],
+      "conexiones": ["Charlie","Maria","Alice"]
+    }
+  ]
+}

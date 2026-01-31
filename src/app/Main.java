@@ -3,8 +3,10 @@
 // Historial de acciones: Stack <Accion> o Deque(Accion) = O(1)
 // Solicitudes de Seguimiento: Queue <Solicitud> Para procesar en orden FIFO O(1)
 
-
-// Main es el punto de entrada donde se ejecuta el codigo
+/*
+ * Punto de entrada del programa.
+ * Orquesta la inicialización de los servicios y lanza la interfaz de usuario.
+ */
 
  public static void main(String[] args) {
 
