@@ -23,7 +23,7 @@ public class DiccionarioSimpleLD<K, V> implements DiccionarioSimpleTDA<K, V> {
 
     private NodoClave<K, V> Clave2NodoClave(K clave) {
         NodoClave<K, V> aux = origen;
-        while (aux != null && aux.clave != clave) {
+        while (aux != null && !aux.clave.equals(clave)) {
             aux = aux.sigClave;
         }
         return aux;

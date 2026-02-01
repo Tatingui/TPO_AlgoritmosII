@@ -1,39 +1,63 @@
-package repositorio; // Única vez y en la primera línea
+package repositorio;
 
 import modelo.Cliente;
-import java.util.*;
-/*
- * Clase encargada de la persistencia en memoria RAM.
- * Implementa las estructuras necesarias para cumplir con la eficiencia exigida.
- */
+import implementaciones.DiccionarioSimpleLD;
+import implementaciones.ColaPrioridadLD;
+import interfaces.DiccionarioSimpleTDA;
+import interfaces.ColaPrioridadTDA;
 
 public class ClienteRepositorio {
-    // Búsqueda por nombre: Eficiencia O(1) - HashMap
-    private Map<String, Cliente> mapaNombres = new HashMap<>();
+    // Definimos los TADs usando tus interfaces
+    // K = String (nombre), V = Cliente
+    private DiccionarioSimpleTDA<String, Cliente> diccionarioNombres;
+    // T = Cliente
+    private ColaPrioridadTDA<Cliente> rankingScoring;
 
-    // Búsqueda por scoring: Eficiencia O(log n) - (TreeMap)
-    private TreeMap<Integer, List<Cliente>> mapaScoring = new TreeMap<>(Collections.reverseOrder());
+    public ClienteRepositorio() {
+        // Instanciamos tus implementaciones LD
+        diccionarioNombres = new DiccionarioSimpleLD<String, Cliente>();
+        diccionarioNombres.InicializarDiccionario();
+
+        rankingScoring = new ColaPrioridadLD<Cliente>();
+        rankingScoring.InicializarCola();
+    }
 
     public void guardarCliente(Cliente cliente) {
-        // Guardar en el mapa de nombres O(1)
-        mapaNombres.put(cliente.getNombre(), cliente);
+        // Agregar(K clave, V valor)
+        diccionarioNombres.Agregar(cliente.getNombre(), cliente);
 
-        // Guardar en el árbol de scoring O(log n)
-        mapaScoring.computeIfAbsent(cliente.getScoring(), k -> new ArrayList<>()).add(cliente);
+        // AcolarPrioridad(T x, int prioridad)
+        rankingScoring.AcolarPrioridad(cliente, cliente.getScoring());
     }
 
     public Cliente buscarPorNombre(String nombre) {
-        return mapaNombres.get(nombre); // O(1)
-    }
-
-    public List<Cliente> buscarPorScoringExacto(int scoring) {
-        return mapaScoring.get(scoring); // O(log n)
+        // Recuperar(K clave)
+        try {
+            return diccionarioNombres.Recuperar(nombre);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     public void mostrarRanking() {
-        System.out.println("--- RANKING DE CLIENTES (Ordenado por Árbol) ---");
-        mapaScoring.forEach((puntos, clientes) -> {
-            System.out.println("Puntaje " + puntos + ": " + clientes);
-        });
+        System.out.println("--- RANKING DE CLIENTES (ColaPrioridadLD) ---");
+
+        ColaPrioridadTDA<Cliente> aux = new ColaPrioridadLD<Cliente>();
+        aux.InicializarCola();
+
+        while (!rankingScoring.ColaVacia()) {
+            Cliente c = rankingScoring.Primero();
+            int p = rankingScoring.Prioridad();
+
+            System.out.println("Scoring: " + p + " | " + c.getNombre());
+
+            aux.AcolarPrioridad(c, p);
+            rankingScoring.Desacolar();
+        }
+
+        while (!aux.ColaVacia()) {
+            rankingScoring.AcolarPrioridad(aux.Primero(), aux.Prioridad());
+            aux.Desacolar();
+        }
     }
 }
