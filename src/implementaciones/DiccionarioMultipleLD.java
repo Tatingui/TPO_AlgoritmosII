@@ -3,42 +3,42 @@ package implementaciones;
 import interfaces.ConjuntoTDA;
 import interfaces.DiccionarioMultipleTDA;
 
-public class DiccionarioMultipleLD implements DiccionarioMultipleTDA {
-    NodoClave origen;
+public class DiccionarioMultipleLD<K, V> implements DiccionarioMultipleTDA<K, V> {
+    NodoClave<K, V> origen;
 
     public void InicializarDiccionario() {
         origen = null;
     }
 
-    public void Agregar(int clave, int valor) {
-        NodoClave nc = Clave2NodoClave(clave);
+    public void Agregar(K clave, V valor) {
+        NodoClave<K, V> nc = Clave2NodoClave(clave);
         if (nc == null) {
-            nc = new NodoClave();
+            nc = new NodoClave<>();
             nc.clave = clave;
             nc.sigClave = origen;
             origen = nc;
         }
-        NodoValor aux = nc.valores;
+        NodoValor<V> aux = nc.valores;
         while (aux != null && aux.valor != valor) {
             aux = aux.sigValor;
         }
         if (aux == null) {
-            NodoValor nv = new NodoValor();
+            NodoValor<V> nv = new NodoValor<V>();
             nv.valor = valor;
             nv.sigValor = nc.valores;
             nc.valores = nv;
         }
     }
 
-    private NodoClave Clave2NodoClave(int clave) {
-        NodoClave aux = origen;
+    private NodoClave<K, V> Clave2NodoClave(K clave) {
+        NodoClave<K, V> aux = origen;
         while (aux != null && aux.clave != clave) {
             aux = aux.sigClave;
         }
         return aux;
     }
 
-    public void EliminarValor(int clave, int valor) {
+    public void EliminarValor(K clave, V valor) {
         if (origen != null) {
             if (origen.clave == clave) {
                 EliminarValorEnNodo(origen, valor);
@@ -46,7 +46,7 @@ public class DiccionarioMultipleLD implements DiccionarioMultipleTDA {
                     origen = origen.sigClave;
                 }
             } else {
-                NodoClave aux = origen;
+                NodoClave<K, V> aux = origen;
                 while (aux.sigClave != null && aux.sigClave.clave
                         != clave) {
                     aux = aux.sigClave;
@@ -61,12 +61,12 @@ public class DiccionarioMultipleLD implements DiccionarioMultipleTDA {
         }
     }
 
-    private void EliminarValorEnNodo(NodoClave nodo, int valor) {
+    private void EliminarValorEnNodo(NodoClave<K, V> nodo, V valor) {
         if (nodo.valores != null) {
             if (nodo.valores.valor == valor) {
                 nodo.valores = nodo.valores.sigValor;
             } else {
-                NodoValor aux = nodo.valores;
+                NodoValor<V> aux = nodo.valores;
                 while (aux.sigValor != null && aux.sigValor.valor
                         != valor) {
                     aux = aux.sigValor;
@@ -78,12 +78,12 @@ public class DiccionarioMultipleLD implements DiccionarioMultipleTDA {
         }
     }
 
-    public void Eliminar(int clave) {
+    public void Eliminar(K clave) {
         if (origen != null) {
             if (origen.clave == clave) {
                 origen = origen.sigClave;
             } else {
-                NodoClave aux = origen;
+                NodoClave<K, V> aux = origen;
                 while (aux.sigClave != null && aux.sigClave.clave
                         != clave) {
                     aux = aux.sigClave;
@@ -95,12 +95,12 @@ public class DiccionarioMultipleLD implements DiccionarioMultipleTDA {
         }
     }
 
-    public ConjuntoTDA Recuperar(int clave) {
-        NodoClave n = Clave2NodoClave(clave);
-        ConjuntoTDA c = new ConjuntoLD();
+    public ConjuntoTDA<V> Recuperar(K clave) {
+        NodoClave<K, V> n = Clave2NodoClave(clave);
+        ConjuntoTDA<V> c = new ConjuntoLD<V>();
         c.InicializarConjunto();
         if (n != null) {
-            NodoValor aux = n.valores;
+            NodoValor<V> aux = n.valores;
             while (aux != null) {
                 c.Agregar(aux.valor);
                 aux = aux.sigValor;
@@ -109,10 +109,10 @@ public class DiccionarioMultipleLD implements DiccionarioMultipleTDA {
         return c;
     }
 
-    public ConjuntoTDA Claves() {
-        ConjuntoTDA c = new ConjuntoLD();
+    public ConjuntoTDA<K> Claves() {
+        ConjuntoTDA<K> c = new ConjuntoLD<K>();
         c.InicializarConjunto();
-        NodoClave aux = origen;
+        NodoClave<K, V> aux = origen;
         while (aux != null) {
             c.Agregar(aux.clave);
             aux = aux.sigClave;
@@ -120,14 +120,14 @@ public class DiccionarioMultipleLD implements DiccionarioMultipleTDA {
         return c;
     }
 
-    static class NodoClave {
-        int clave;
-        NodoValor valores;
-        NodoClave sigClave;
+    static class NodoClave<K, V> {
+        K clave;
+        NodoValor<V> valores;
+        NodoClave<K, V> sigClave;
     }
 
-    static class NodoValor {
-        int valor;
-        NodoValor sigValor;
+    static class NodoValor<V> {
+        V valor;
+        NodoValor<V> sigValor;
     }
 }

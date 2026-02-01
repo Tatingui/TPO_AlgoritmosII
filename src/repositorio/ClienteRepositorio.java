@@ -2,6 +2,10 @@ package repositorio; // Única vez y en la primera línea
 
 import modelo.Cliente;
 import java.util.*;
+/*
+ * Clase encargada de la persistencia en memoria RAM.
+ * Implementa las estructuras necesarias para cumplir con la eficiencia exigida.
+ */
 
 public class ClienteRepositorio {
     // Búsqueda por nombre: Eficiencia O(1) - HashMap

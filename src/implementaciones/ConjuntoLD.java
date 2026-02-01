@@ -2,8 +2,8 @@ package implementaciones;
 
 import interfaces.ConjuntoTDA;
 
-public class ConjuntoLD implements ConjuntoTDA {
-    Nodo c;
+public class ConjuntoLD<T> implements ConjuntoTDA<T> {
+    Nodo<T> c;
 
     public void InicializarConjunto() {
         c = null;
@@ -13,27 +13,27 @@ public class ConjuntoLD implements ConjuntoTDA {
         return (c == null);
     }
 
-    public void Agregar(int x) {
-        /* Verifica que x no este en el conjunto */
+    public void Agregar(T x) {
+        // Verifica que x no este en el conjunto
         if (!this.Pertenece(x)) {
-            Nodo aux = new Nodo();
+            Nodo<T> aux = new Nodo<T>();
             aux.info = x;
             aux.sig = c;
             c = aux;
         }
     }
 
-    public int Elegir() {
+    public T Elegir() {
         return c.info;
     }
 
-    public void Sacar(int x) {
+    public void Sacar(T x) {
         if (c != null) {
-// si es el primer elemento de la lista
+            // Si es el primer elemento de la lista
             if (c.info == x) {
                 c = c.sig;
             } else {
-                Nodo aux = c;
+                Nodo<T> aux = c;
                 while (aux.sig != null && aux.sig.info != x)
                     aux = aux.sig;
                 if (aux.sig != null)
@@ -42,8 +42,8 @@ public class ConjuntoLD implements ConjuntoTDA {
         }
     }
 
-    public boolean Pertenece(int x) {
-        Nodo aux = c;
+    public boolean Pertenece(T x) {
+        Nodo<T> aux = c;
         while ((aux != null) && (aux.info != x)) {
             aux = aux.sig;
         }

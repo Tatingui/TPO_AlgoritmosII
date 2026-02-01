@@ -3,17 +3,17 @@ package implementaciones;
 import interfaces.ConjuntoTDA;
 import interfaces.DiccionarioSimpleTDA;
 
-public class DiccionarioSimpleLD implements DiccionarioSimpleTDA {
-    NodoClave origen;
+public class DiccionarioSimpleLD<K, V> implements DiccionarioSimpleTDA<K, V> {
+    NodoClave<K, V> origen;
 
     public void InicializarDiccionario() {
         origen = null;
     }
 
-    public void Agregar(int clave, int valor) {
-        NodoClave nc = Clave2NodoClave(clave);
+    public void Agregar(K clave, V valor) {
+        NodoClave<K, V> nc = Clave2NodoClave(clave);
         if (nc == null) {
-            nc = new NodoClave();
+            nc = new NodoClave<K, V>();
             nc.clave = clave;
             nc.sigClave = origen;
             origen = nc;
@@ -21,20 +21,20 @@ public class DiccionarioSimpleLD implements DiccionarioSimpleTDA {
         nc.valor = valor;
     }
 
-    private NodoClave Clave2NodoClave(int clave) {
-        NodoClave aux = origen;
+    private NodoClave<K, V> Clave2NodoClave(K clave) {
+        NodoClave<K, V> aux = origen;
         while (aux != null && aux.clave != clave) {
             aux = aux.sigClave;
         }
         return aux;
     }
 
-    public void Eliminar(int clave) {
+    public void Eliminar(K clave) {
         if (origen != null) {
             if (origen.clave == clave) {
                 origen = origen.sigClave;
             } else {
-                NodoClave aux = origen;
+                NodoClave<K, V> aux = origen;
                 while (aux.sigClave != null && aux.sigClave.clave
                         != clave) {
                     aux = aux.sigClave;
@@ -46,15 +46,15 @@ public class DiccionarioSimpleLD implements DiccionarioSimpleTDA {
         }
     }
 
-    public int Recuperar(int clave) {
-        NodoClave n = Clave2NodoClave(clave);
+    public V Recuperar(K clave) {
+        NodoClave<K, V> n = Clave2NodoClave(clave);
         return n.valor;
     }
 
-    public ConjuntoTDA Claves() {
-        ConjuntoTDA c = new ConjuntoLD();
+    public ConjuntoTDA<K> Claves() {
+        ConjuntoTDA<K> c = new ConjuntoLD<K>();
         c.InicializarConjunto();
-        NodoClave aux = origen;
+        NodoClave<K, V> aux = origen;
         while (aux != null) {
             c.Agregar(aux.clave);
             aux = aux.sigClave;
@@ -62,9 +62,9 @@ public class DiccionarioSimpleLD implements DiccionarioSimpleTDA {
         return c;
     }
 
-    static class NodoClave {
-        int clave;
-        int valor;
-        NodoClave sigClave;
+    static class NodoClave<K, V> {
+        K clave;
+        V valor;
+        NodoClave<K, V> sigClave;
     }
 }

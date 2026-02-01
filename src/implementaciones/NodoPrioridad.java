@@ -1,7 +1,7 @@
 package implementaciones;
 
-class NodoPrioridad {
-    int info;
+class NodoPrioridad<T> {
+    T info;
     int prioridad;
-    NodoPrioridad sig;
+    NodoPrioridad<T> sig;
 }

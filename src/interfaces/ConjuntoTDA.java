@@ -1,15 +1,15 @@
 package interfaces;
 
-public interface ConjuntoTDA {
+public interface ConjuntoTDA<T> {
     void InicializarConjunto();
 
     boolean ConjuntoVacio();
 
-    void Agregar(int x);
+    void Agregar(T x);
 
-    int Elegir();
+    T Elegir();
 
-    void Sacar(int x);
+    void Sacar(T x);
 
-    boolean Pertenece(int x);
+    boolean Pertenece(T x);
 }

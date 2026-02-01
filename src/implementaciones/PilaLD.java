@@ -2,15 +2,15 @@ package implementaciones;
 
 import interfaces.PilaTDA;
 
-public class PilaLD implements PilaTDA {
-    Nodo primero;
+public class PilaLD<T> implements PilaTDA<T> {
+    Nodo<T> primero;
 
     public void InicializarPila() {
         primero = null;
     }
 
-    public void Apilar(int x) {
-        Nodo aux = new Nodo();
+    public void Apilar(T x) {
+        Nodo<T> aux = new Nodo<T>();
         aux.info = x;
         aux.sig = primero;
         primero = aux;
@@ -24,7 +24,7 @@ public class PilaLD implements PilaTDA {
         return (primero == null);
     }
 
-    public int Tope() {
+    public T Tope() {
         return primero.info;
     }
 }
