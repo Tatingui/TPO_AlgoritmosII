@@ -1,5 +1,6 @@
-package modelo;
-import interfaces.ColaTDA;
+package app.servicio;
+import app.interfaces.ColaTDA;
+import app.modelo.Solicitud;
 
 
 public class procesadorSolicitudes {
