@@ -13,7 +13,7 @@ public class DiccionarioSimpleLD<K, V> implements DiccionarioSimpleTDA<K, V> {
     public void Agregar(K clave, V valor) {
         NodoClave<K, V> nc = Clave2NodoClave(clave);
         if (nc == null) {
-            nc = new NodoClave<K, V>();
+            nc = new NodoClave<>();
             nc.clave = clave;
             nc.sigClave = origen;
             origen = nc;
@@ -52,7 +52,7 @@ public class DiccionarioSimpleLD<K, V> implements DiccionarioSimpleTDA<K, V> {
     }
 
     public ConjuntoTDA<K> Claves() {
-        ConjuntoTDA<K> c = new ConjuntoLD<K>();
+        ConjuntoTDA<K> c = new ConjuntoLD<>();
         c.InicializarConjunto();
         NodoClave<K, V> aux = origen;
         while (aux != null) {

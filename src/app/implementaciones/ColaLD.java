@@ -14,7 +14,7 @@ public class ColaLD<T> implements ColaTDA<T> {
     }
 
     public void Acolar(T x) {
-        Nodo<T> aux = new Nodo<T>();
+        Nodo<T> aux = new Nodo<>();
         aux.info = x;
         aux.sig = null;
         // Si la cola no está vacía
