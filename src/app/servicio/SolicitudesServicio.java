@@ -5,7 +5,7 @@
  * Implementa el concepto de Cola (FIFO) para respetar el orden de llegada.
  */
 
-package servicio;
+package app.servicio;
 
 public class SolicitudesServicio {
 }

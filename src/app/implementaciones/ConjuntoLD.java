@@ -1,6 +1,6 @@
-package implementaciones;
+package app.implementaciones;
 
-import interfaces.ConjuntoTDA;
+import app.interfaces.ConjuntoTDA;
 
 public class ConjuntoLD<T> implements ConjuntoTDA<T> {
     Nodo<T> c;

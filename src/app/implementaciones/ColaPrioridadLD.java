@@ -1,6 +1,6 @@
-package implementaciones;
+package app.implementaciones;
 
-import interfaces.ColaPrioridadTDA;
+import app.interfaces.ColaPrioridadTDA;
 
 public class ColaPrioridadLD<T> implements ColaPrioridadTDA<T> {
     NodoPrioridad<T> mayorPrioridad;

@@ -1,6 +1,7 @@
-package interfaces;
+package app.interfaces;
 
-public interface DiccionarioMultipleTDA<K, V> {
+public interface DiccionarioSimpleTDA<K, V> {
+    // Siempre que el diccionario esté inicializado
     void InicializarDiccionario();
 
     // Siempre que el diccionario esté inicializado
@@ -9,11 +10,8 @@ public interface DiccionarioMultipleTDA<K, V> {
     // Siempre que el diccionario esté inicializado
     void Eliminar(K clave);
 
-    // Siempre que el diccionario esté inicializado
-    void EliminarValor(K clave, V valor);
-
-    // Siempre que el diccionario esté inicializado
-    ConjuntoTDA<V> Recuperar(K clave);
+    // Siempre que el diccionario esté inicializado y la clave exista en el mismo
+    V Recuperar(K clave);
 
     // Siempre que el diccionario esté inicializado
     ConjuntoTDA<K> Claves();
