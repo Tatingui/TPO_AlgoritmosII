@@ -1,6 +1,6 @@
-package implementaciones;
+package app.implementaciones;
 
-import interfaces.PilaTDA;
+import app.interfaces.PilaTDA;
 
 public class PilaLD<T> implements PilaTDA<T> {
     Nodo<T> primero;

@@ -8,7 +8,7 @@ package app;// Busqueda por nombres: HashMap <String, Cliente> = O(1)
  * Orquesta la inicialización de los servicios y lanza la interfaz de usuario.
  */
 
-import servicio.RedSocialManager;
+import app.servicio.RedSocialManager;
 
 public class Main {
     public static void main(String[] args) {

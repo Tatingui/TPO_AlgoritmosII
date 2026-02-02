@@ -1,4 +1,4 @@
-package implementaciones;
+package app.implementaciones;
 
 class Nodo<T> {
     T info;

@@ -5,10 +5,12 @@
  * Utiliza el concepto de Pila (LIFO).
  */
 
-package servicio;
+package app.servicio;
 
-import implementaciones.PilaLD;
-import modelo.Accion;
+import app.implementaciones.PilaLD;
+import app.modelo.Accion;
+
+import java.time.LocalDateTime;
 
 public class HistorialServicio {
     private final PilaLD<Accion> historial;
@@ -19,7 +21,7 @@ public class HistorialServicio {
     }
 
     public void registrarAccion(String tipo, String descripcion) {
-        historial.Apilar(new Accion(tipo, descripcion));
+        historial.Apilar(new Accion(tipo, descripcion, LocalDateTime.now()));
     }
 
     public void deshacerUltimaAccion() {

@@ -1,6 +1,6 @@
-package implementaciones;
+package app.implementaciones;
 
-import interfaces.ColaTDA;
+import app.interfaces.ColaTDA;
 
 public class ColaLD<T> implements ColaTDA<T> {
     // Primer elemento en la cola

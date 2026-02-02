@@ -1,20 +1,13 @@
-package servicio;
-// Orquestador principal
+package app.servicio;
 
-/*
- * Esta clase centraliza la lógica de negocio siguiendo el principio de responsabilidad unica
- * Coordina las interacciones entre los repositorios de datos y los servicios de historial/solicitudes
- */
-
-
-import modelo.Cliente;
-import persistencia.JsonLoader;
-import repositorio.ClienteRepositorio;
-import java.util.List;
+import app.modelo.Cliente;
+import app.modelo.Clientes;
+import app.persistencia.JsonLoader;
+import app.repositorio.ClienteRepositorio;
 
 public class RedSocialManager {
-    private ClienteRepositorio repositorio;
-    private JsonLoader loader;
+    private final ClienteRepositorio repositorio;
+    private final JsonLoader loader;
 
     public RedSocialManager() {
         this.repositorio = new ClienteRepositorio();
@@ -22,9 +15,9 @@ public class RedSocialManager {
     }
 
     public void cargarDesdeArchivo(String ruta) {
-        List<Cliente> clientesNuevos = loader.cargarClientes(ruta);
+        Clientes clientesNuevos = loader.cargarClientes(ruta);
 
-        for (Cliente c : clientesNuevos) {
+        for (Cliente c : clientesNuevos.clientes()) {
             repositorio.guardarCliente(c);
         }
         System.out.println("LOG: Carga completada.");

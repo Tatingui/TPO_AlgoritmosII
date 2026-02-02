@@ -1,7 +1,7 @@
-package implementaciones;
+package app.implementaciones;
 
-import interfaces.ConjuntoTDA;
-import interfaces.DiccionarioMultipleTDA;
+import app.interfaces.ConjuntoTDA;
+import app.interfaces.DiccionarioMultipleTDA;
 
 public class DiccionarioMultipleLD<K, V> implements DiccionarioMultipleTDA<K, V> {
     NodoClave<K, V> origen;

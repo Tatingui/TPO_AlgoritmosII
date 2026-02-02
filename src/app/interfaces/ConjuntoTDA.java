@@ -1,4 +1,4 @@
-package interfaces;
+package app.interfaces;
 
 public interface ConjuntoTDA<T> {
     void InicializarConjunto();
