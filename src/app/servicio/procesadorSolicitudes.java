@@ -1,5 +1,5 @@
 package app.servicio;
-import interfaces.ColaTDA;
+import app.interfaces.ColaTDA;
 import app.modelo.Solicitud;
 
 
