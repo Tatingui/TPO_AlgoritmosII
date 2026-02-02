@@ -11,7 +11,7 @@ public class ColaPrioridadLD<T> implements ColaPrioridadTDA<T> {
 
     public void AcolarPrioridad(T x, int prioridad) {
         // Creo el nuevo nodo que voy a acolar
-        NodoPrioridad<T> nuevo = new NodoPrioridad<T>();
+        NodoPrioridad<T> nuevo = new NodoPrioridad<>();
         nuevo.info = x;
         nuevo.prioridad = prioridad;
         // Si la cola está vacía o es más prioritario que el primero,

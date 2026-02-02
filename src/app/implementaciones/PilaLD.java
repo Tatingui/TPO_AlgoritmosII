@@ -10,7 +10,7 @@ public class PilaLD<T> implements PilaTDA<T> {
     }
 
     public void Apilar(T x) {
-        Nodo<T> aux = new Nodo<T>();
+        Nodo<T> aux = new Nodo<>();
         aux.info = x;
         aux.sig = primero;
         primero = aux;

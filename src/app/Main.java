@@ -1,4 +1,6 @@
-package app;// Busqueda por nombres: HashMap <String, Cliente> = O(1)
+package app;
+
+// Busqueda por nombres: HashMap <String, Cliente> = O(1)
 // Busqueda por scoring: TreeMap <Integer, Integer> = O(log n) (HashMap desordenaria esto)
 // Historial de acciones: Stack <Accion> o Deque(Accion) = O(1)
 // Solicitudes de Seguimiento: Queue <Solicitud> Para procesar en orden FIFO O(1)
@@ -11,7 +13,7 @@ package app;// Busqueda por nombres: HashMap <String, Cliente> = O(1)
 import app.servicio.RedSocialManager;
 
 public class Main {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         RedSocialManager sistema = new RedSocialManager();
 
         // 1. Se cargan los datos

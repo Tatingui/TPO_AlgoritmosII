@@ -16,7 +16,7 @@ public class ConjuntoLD<T> implements ConjuntoTDA<T> {
     public void Agregar(T x) {
         // Verifica que x no este en el conjunto
         if (!this.Pertenece(x)) {
-            Nodo<T> aux = new Nodo<T>();
+            Nodo<T> aux = new Nodo<>();
             aux.info = x;
             aux.sig = c;
             c = aux;

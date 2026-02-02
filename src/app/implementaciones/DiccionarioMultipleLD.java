@@ -23,7 +23,7 @@ public class DiccionarioMultipleLD<K, V> implements DiccionarioMultipleTDA<K, V>
             aux = aux.sigValor;
         }
         if (aux == null) {
-            NodoValor<V> nv = new NodoValor<V>();
+            NodoValor<V> nv = new NodoValor<>();
             nv.valor = valor;
             nv.sigValor = nc.valores;
             nc.valores = nv;
@@ -97,7 +97,7 @@ public class DiccionarioMultipleLD<K, V> implements DiccionarioMultipleTDA<K, V>
 
     public ConjuntoTDA<V> Recuperar(K clave) {
         NodoClave<K, V> n = Clave2NodoClave(clave);
-        ConjuntoTDA<V> c = new ConjuntoLD<V>();
+        ConjuntoTDA<V> c = new ConjuntoLD<>();
         c.InicializarConjunto();
         if (n != null) {
             NodoValor<V> aux = n.valores;
@@ -110,7 +110,7 @@ public class DiccionarioMultipleLD<K, V> implements DiccionarioMultipleTDA<K, V>
     }
 
     public ConjuntoTDA<K> Claves() {
-        ConjuntoTDA<K> c = new ConjuntoLD<K>();
+        ConjuntoTDA<K> c = new ConjuntoLD<>();
         c.InicializarConjunto();
         NodoClave<K, V> aux = origen;
         while (aux != null) {
