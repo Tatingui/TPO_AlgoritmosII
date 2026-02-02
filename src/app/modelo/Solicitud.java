@@ -1,4 +1,4 @@
-package modelo;
+package app.modelo;
 
 public class Solicitud {
     public final String seguidor;

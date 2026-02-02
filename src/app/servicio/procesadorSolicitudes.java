@@ -1,5 +1,6 @@
-package modelo;
+package app.servicio;
 import interfaces.ColaTDA;
+import app.modelo.Solicitud;
 
 
 public class procesadorSolicitudes {
