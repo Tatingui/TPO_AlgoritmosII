@@ -27,6 +27,6 @@ public class Main {
 
         // 3. Busqueda de ranking O(log n) | TreeMap
         System.out.println("\n--- Prueba de Ranking ---");
-        sistema.imprimirRanking();
+        sistema.imprimirRankingCompleto();
     }
 }

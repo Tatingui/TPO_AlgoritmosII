@@ -23,7 +23,8 @@ public class DiccionarioSimpleLD<K, V> implements DiccionarioSimpleTDA<K, V> {
 
     private NodoClave<K, V> Clave2NodoClave(K clave) {
         NodoClave<K, V> aux = origen;
-        while (aux != null && aux.clave != clave) {
+        // Usamos !aux.clave.equals(clave) en lugar de !=
+        while (aux != null && !aux.clave.equals(clave)) {
             aux = aux.sigClave;
         }
         return aux;
@@ -48,6 +49,10 @@ public class DiccionarioSimpleLD<K, V> implements DiccionarioSimpleTDA<K, V> {
 
     public V Recuperar(K clave) {
         NodoClave<K, V> n = Clave2NodoClave(clave);
+        // Validacion por si n es null osea que no existe en el diccionario
+        if (n == null) {
+            return null;
+        }
         return n.valor;
     }
 
