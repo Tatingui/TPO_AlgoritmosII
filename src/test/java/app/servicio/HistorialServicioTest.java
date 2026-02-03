@@ -2,11 +2,7 @@ package app.servicio;
 
 import app.implementaciones.PilaLD;
 import app.modelo.Accion;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -18,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Pruebas de HistorialServicio")
 class HistorialServicioTest {
 
-    private HistorialServicio historialServicio;
     private final PrintStream standardOut = System.out;
+    private HistorialServicio historialServicio;
     private ByteArrayOutputStream capturedOutput;
 
     @BeforeEach
@@ -32,6 +28,50 @@ class HistorialServicioTest {
     @AfterEach
     void tearDown() {
         System.setOut(standardOut);
+    }
+
+    /**
+     * Extrae el historial interno de manera segura para verificación.
+     * Utiliza reflexión para acceder al campo privado.
+     */
+    private PilaLD<Accion> extraerHistorial() {
+        try {
+            var field = HistorialServicio.class.getDeclaredField("historial");
+            field.setAccessible(true);
+            return (PilaLD<Accion>) field.get(historialServicio);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            fail("No se pudo acceder al historial: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Cuenta el número de acciones en la pila sin modificarla.
+     */
+    private int contarAccionesEnPila() {
+        try {
+            PilaLD<Accion> pila = extraerHistorial();
+            int contador = 0;
+            PilaLD<Accion> temp = new PilaLD<>();
+            temp.InicializarPila();
+
+            while (!pila.PilaVacia()) {
+                contador++;
+                temp.Apilar(pila.Tope());
+                pila.Desapilar();
+            }
+
+            // Restaurar el estado original
+            while (!temp.PilaVacia()) {
+                pila.Apilar(temp.Tope());
+                temp.Desapilar();
+            }
+
+            return contador;
+        } catch (Exception e) {
+            fail("Error al contar acciones: " + e.getMessage());
+            return -1;
+        }
     }
 
     @Nested
@@ -105,9 +145,9 @@ class HistorialServicioTest {
 
             if (!tempPila.PilaVacia()) {
                 Accion accion = tempPila.Tope();
-                assertTrue(accion.timestamp().isAfter(antesDeRegistro.minus(1, ChronoUnit.SECONDS)),
+                assertTrue(accion.timestamp().isAfter(antesDeRegistro.minusSeconds(1)),
                         "Timestamp debe estar después del antes");
-                assertTrue(accion.timestamp().isBefore(despuesDeRegistro.plus(1, ChronoUnit.SECONDS)),
+                assertTrue(accion.timestamp().isBefore(despuesDeRegistro.plusSeconds(1)),
                         "Timestamp debe estar antes del después");
             }
         }
@@ -195,6 +235,8 @@ class HistorialServicioTest {
         }
     }
 
+    // ==================== MÉTODOS AUXILIARES ====================
+
     @Nested
     @DisplayName("Pruebas de mostrarHistorial")
     class MostrarHistorialTests {
@@ -212,25 +254,25 @@ class HistorialServicioTest {
         @Test
         @DisplayName("Mostrar una acción en historial")
         void testMostrarUnaAccion() {
-            historialServicio.registrarAccion("TestTipo", "TestDescripción");
+            historialServicio.registrarAccion("TestTipo", "TestDescripcion");
             historialServicio.mostrarHistorial();
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("TestTipo") && output.contains("TestDescripción"),
+            assertTrue(output.contains("TestTipo") && output.contains("TestDescripcion"),
                     "Debe mostrar la acción registrada");
         }
 
         @Test
         @DisplayName("Mostrar múltiples acciones en historial")
         void testMostrarMultiplesAcciones() {
-            historialServicio.registrarAccion("Acción 1", "Descripción 1");
-            historialServicio.registrarAccion("Acción 2", "Descripción 2");
-            historialServicio.registrarAccion("Acción 3", "Descripción 3");
+            historialServicio.registrarAccion("Accion 1", "Descripcion 1");
+            historialServicio.registrarAccion("Accion 2", "Descripcion 2");
+            historialServicio.registrarAccion("Accion 3", "Descripcion 3");
 
             historialServicio.mostrarHistorial();
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("Acción 1") && output.contains("Acción 2") && output.contains("Acción 3"),
+            assertTrue(output.contains("Accion 1") && output.contains("Accion 2") && output.contains("Accion 3"),
                     "Debe mostrar todas las acciones");
         }
 
@@ -371,52 +413,6 @@ class HistorialServicioTest {
             String output = capturedOutput.toString();
             assertTrue(output.contains("A") && !output.contains("B"),
                     "Debe mostrar solo la acción restante");
-        }
-    }
-
-    // ==================== MÉTODOS AUXILIARES ====================
-
-    /**
-     * Extrae el historial interno de manera segura para verificación.
-     * Utiliza reflexión para acceder al campo privado.
-     */
-    private PilaLD<Accion> extraerHistorial() {
-        try {
-            var field = HistorialServicio.class.getDeclaredField("historial");
-            field.setAccessible(true);
-            return (PilaLD<Accion>) field.get(historialServicio);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail("No se pudo acceder al historial: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Cuenta el número de acciones en la pila sin modificarla.
-     */
-    private int contarAccionesEnPila() {
-        try {
-            PilaLD<Accion> pila = extraerHistorial();
-            int contador = 0;
-            PilaLD<Accion> temp = new PilaLD<>();
-            temp.InicializarPila();
-
-            while (!pila.PilaVacia()) {
-                contador++;
-                temp.Apilar(pila.Tope());
-                pila.Desapilar();
-            }
-
-            // Restaurar el estado original
-            while (!temp.PilaVacia()) {
-                pila.Apilar(temp.Tope());
-                temp.Desapilar();
-            }
-
-            return contador;
-        } catch (Exception e) {
-            fail("Error al contar acciones: " + e.getMessage());
-            return -1;
         }
     }
 }
