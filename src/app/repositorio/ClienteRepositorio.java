@@ -1,38 +1,82 @@
-package app.repositorio; // Única vez y en la primera línea
+package app.repositorio;
 
 import app.modelo.Cliente;
-
-import java.util.*;
-/*
- * Clase encargada de la persistencia en memoria RAM.
- * Implementa las estructuras necesarias para cumplir con la eficiencia exigida.
- */
+import app.interfaces.DiccionarioSimpleTDA;
+import app.interfaces.ColaPrioridadTDA;
+import app.implementaciones.DiccionarioSimpleLD;
+import app.implementaciones.ColaPrioridadLD;
 
 public class ClienteRepositorio {
-    // Búsqueda por nombre: Eficiencia O(1) - HashMap
-    private final Map<String, Cliente> mapaNombres = new HashMap<>();
+    // Reemplazamos HashMap por DiccionarioSimpleTDA
+    private final DiccionarioSimpleTDA<String, Cliente> mapaNombres;
 
-    // Búsqueda por scoring: Eficiencia O(log n) - (TreeMap)
-    private final TreeMap<Integer, List<Cliente>> mapaScoring = new TreeMap<>(Collections.reverseOrder());
+    // Reemplazamos TreeMap por ColaPrioridadTDA
+    private final ColaPrioridadTDA<Cliente> rankingScoring;
+
+    public ClienteRepositorio() {
+        mapaNombres = new DiccionarioSimpleLD<>();
+        mapaNombres.InicializarDiccionario();
+
+        rankingScoring = new ColaPrioridadLD<>();
+        rankingScoring.InicializarCola();
+    }
 
     public void guardarCliente(Cliente cliente) {
-        // Guardar en el mapa de nombres O(1)
-        mapaNombres.put(cliente.nombre(), cliente);
+        // O(n) porque es LD, pero cumple con el TDA
+        mapaNombres.Agregar(cliente.nombre(), cliente);
 
-        // Guardar en el árbol de scoring O(log n)
-        mapaScoring.computeIfAbsent(cliente.scoring(), k -> new ArrayList<>()).add(cliente);
+        // La cola de prioridad mantiene el orden de scoring automáticamente
+        rankingScoring.AcolarPrioridad(cliente, cliente.scoring());
     }
 
     public Cliente buscarPorNombre(String nombre) {
-        return mapaNombres.get(nombre); // O(1)
-    }
-
-    public List<Cliente> buscarPorScoringExacto(int scoring) {
-        return mapaScoring.get(scoring); // O(log n)
+        return mapaNombres.Recuperar(nombre);
     }
 
     public void mostrarRanking() {
-        System.out.println("--- RANKING DE CLIENTES (Ordenado por Árbol) ---");
-        mapaScoring.forEach((puntos, clientes) -> System.out.println("Puntaje " + puntos + ": " + clientes));
+        System.out.println("--- RANKING DE CLIENTES (Usando Cola de Prioridad) ---");
+        // Clonamos para no destruir la original al mostrar
+        ColaPrioridadTDA<Cliente> aux = new ColaPrioridadLD<>();
+        aux.InicializarCola();
+
+        while (!rankingScoring.ColaVacia()) {
+            Cliente c = rankingScoring.Primero();
+            System.out.println("Puntaje " + rankingScoring.Prioridad() + ": " + c.nombre());
+
+            aux.AcolarPrioridad(c, rankingScoring.Prioridad());
+            rankingScoring.Desacolar();
+        }
+        // Restaurar
+        reponerCola(aux);
+    }
+
+    private void reponerCola(ColaPrioridadTDA<Cliente> aux) {
+        while (!aux.ColaVacia()) {
+            rankingScoring.AcolarPrioridad(aux.Primero(), aux.Prioridad());
+            aux.Desacolar();
+        }
+    }
+
+    public void buscarPorScoring(int scoringBuscado) {
+        ColaPrioridadTDA<Cliente> aux = new ColaPrioridadLD<>();
+        aux.InicializarCola();
+        boolean huboResultados = false;
+
+        while (!rankingScoring.ColaVacia()) {
+            Cliente c = rankingScoring.Primero();
+            int prioridadActual = rankingScoring.Prioridad();
+
+            if (prioridadActual == scoringBuscado) {
+                System.out.println("-> " + c.nombre());
+                huboResultados = true;
+            }
+
+            aux.AcolarPrioridad(c, prioridadActual);
+            rankingScoring.Desacolar();
+        }
+        // Restaurar la cola original
+        reponerCola(aux);
+
+        if (!huboResultados) System.out.println("No se encontraron clientes con ese puntaje.");
     }
 }

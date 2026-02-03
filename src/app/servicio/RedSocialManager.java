@@ -16,23 +16,31 @@ public class RedSocialManager {
 
     public void cargarDesdeArchivo(String ruta) {
         Clientes clientesNuevos = loader.cargarClientes(ruta);
-
-        for (Cliente c : clientesNuevos.clientes()) {
-            repositorio.guardarCliente(c);
+        if (clientesNuevos != null) {
+            for (Cliente c : clientesNuevos.clientes()) {
+                repositorio.guardarCliente(c);
+            }
+            System.out.println("LOG: Carga de clientes completada.");
         }
-        System.out.println("LOG: Carga completada.");
     }
 
+    // Cumple: Búsqueda por nombre
     public void buscarYMostrarCliente(String nombre) {
         Cliente c = repositorio.buscarPorNombre(nombre);
         if (c != null) {
-            System.out.println("Cliente encontrado: " + c);
+            System.out.println("Encontrado por Nombre: " + c);
         } else {
-            System.out.println("El cliente " + nombre + " no existe.");
+            System.out.println("El cliente '" + nombre + "' no existe.");
         }
     }
 
-    public void imprimirRanking() {
+    // Cumple: Búsqueda por scoring (Usa la Cola de Prioridad del Repositorio)
+    public void buscarYMostrarPorScoring(int scoringBuscado) {
+        System.out.println("--- Buscando clientes con scoring: " + scoringBuscado + " ---");
+        repositorio.buscarPorScoring(scoringBuscado);
+    }
+
+    public void imprimirRankingCompleto() {
         repositorio.mostrarRanking();
     }
 }
