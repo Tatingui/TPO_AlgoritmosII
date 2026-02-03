@@ -15,6 +15,9 @@ public class RedSocialManager {
     }
 
     public void cargarDesdeArchivo(String ruta) {
+        if (ruta == null) {
+            throw new IllegalArgumentException("La ruta para cargar JSON no existe");
+        }
         Clientes clientesNuevos = loader.cargarClientes(ruta);
         if (clientesNuevos != null) {
             for (Cliente c : clientesNuevos.clientes()) {
@@ -26,6 +29,9 @@ public class RedSocialManager {
 
     // Cumple: Búsqueda por nombre
     public void buscarYMostrarCliente(String nombre) {
+        if (nombre == null) {
+            throw new IllegalArgumentException("El nombre tiene que ser un valor no nulo");
+        }
         Cliente c = repositorio.buscarPorNombre(nombre);
         if (c != null) {
             System.out.println("Encontrado por Nombre: " + c);

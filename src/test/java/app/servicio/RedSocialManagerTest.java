@@ -1,10 +1,6 @@
 package app.servicio;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -14,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Pruebas de RedSocialManager")
 class RedSocialManagerTest {
 
-    private RedSocialManager redSocialManager;
     private final PrintStream standardOut = System.out;
+    private RedSocialManager redSocialManager;
     private ByteArrayOutputStream capturedOutput;
 
     @BeforeEach
@@ -40,8 +36,8 @@ class RedSocialManagerTest {
             redSocialManager.cargarDesdeArchivo("clientes_test.json");
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("LOG: Carga completada"),
-                    "Debe mostrar mensaje de carga completada");
+            assertTrue(output.contains("LOG: Carga de clientes completada"),
+                    "Debe mostrar mensaje de carga de clientes completada");
         }
 
         @Test
@@ -51,34 +47,30 @@ class RedSocialManagerTest {
 
             String output = capturedOutput.toString();
             // El JsonLoader imprime error si la carga falla
-            assertFalse(output.contains("LOG: Carga completada") && output.contains("Error al leer"),
+            assertFalse(output.contains("LOG: Carga de clientes completada") && output.contains("Error al leer"),
                     "Debe intentar cargar pero puede fallar gracefully");
         }
 
         @Test
         @DisplayName("Cargar archivo con ruta nula")
         void testCargarArchivoRutaNula() {
-            assertThrows(Exception.class, () -> {
-                redSocialManager.cargarDesdeArchivo(null);
-            }, "Debe lanzar excepción con ruta nula");
+            assertThrows(Exception.class, () -> redSocialManager.cargarDesdeArchivo(null), "Debe lanzar excepción con ruta nula");
         }
 
         @Test
         @DisplayName("Cargar archivo vacío")
         void testCargarArchivoVacio() {
             // Este test puede variar según el comportamiento de JsonLoader
-            assertDoesNotThrow(() -> {
-                redSocialManager.cargarDesdeArchivo("clientes_test.json");
-            }, "No debe lanzar excepción");
+            assertDoesNotThrow(() -> redSocialManager.cargarDesdeArchivo("clientes_test.json"), "No debe lanzar excepción");
         }
 
         @Test
-        @DisplayName("Mensaje de carga completada se imprime")
+        @DisplayName("Mensaje de carga de clientes completada se imprime")
         void testMensajeCargaCompletada() {
             redSocialManager.cargarDesdeArchivo("clientes_test.json");
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("LOG: Carga completada"),
+            assertTrue(output.contains("LOG: Carga de clientes completada"),
                     "El mensaje debe indicar que la carga se completó");
         }
 
@@ -94,7 +86,7 @@ class RedSocialManagerTest {
             redSocialManager.cargarDesdeArchivo("clientes_test.json");
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("LOG: Carga completada"),
+            assertTrue(output.contains("LOG: Carga de clientes completada"),
                     "Debe poder cargar múltiples veces");
         }
     }
@@ -117,7 +109,7 @@ class RedSocialManagerTest {
             redSocialManager.buscarYMostrarCliente("Juan");
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("Cliente encontrado") && output.contains("Juan"),
+            assertTrue(output.contains("Encontrado por Nombre") && output.contains("Juan"),
                     "Debe mostrar que el cliente fue encontrado");
         }
 
@@ -144,9 +136,7 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Buscar cliente con nombre nulo")
         void testBuscarClienteNombreNulo() {
-            assertThrows(Exception.class, () -> {
-                redSocialManager.buscarYMostrarCliente(null);
-            }, "Debe lanzar excepción con nombre nulo");
+            assertThrows(IllegalArgumentException.class, () -> redSocialManager.buscarYMostrarCliente(null), "Debe lanzar excepción con nombre nulo");
         }
 
         @Test
@@ -173,7 +163,7 @@ class RedSocialManagerTest {
                 redSocialManager.buscarYMostrarCliente(nombre);
 
                 String output = capturedOutput.toString();
-                if (output.contains("Cliente encontrado")) {
+                if (output.contains("Encontrado por Nombre")) {
                     encontrados++;
                 }
                 capturedOutput = tempOutput;
@@ -184,7 +174,7 @@ class RedSocialManagerTest {
         }
 
         @Test
-        @DisplayName("Información del cliente encontrado es correcta")
+        @DisplayName("Información del Encontrado por Nombre es correcta")
         void testInfoClienteEncontrado() {
             redSocialManager.buscarYMostrarCliente("Juan");
 
@@ -203,13 +193,13 @@ class RedSocialManagerTest {
             redSocialManager.buscarYMostrarCliente("Maria");
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("Cliente encontrado") && output.contains("Maria"),
+            assertTrue(output.contains("Encontrado por Nombre") && output.contains("Maria"),
                     "Debe encontrar el cliente después de segunda carga");
         }
     }
 
     @Nested
-    @DisplayName("Pruebas de imprimirRanking")
+    @DisplayName("Pruebas de imprimirRankingCompleto();")
     class ImprimirRankingTests {
 
         @BeforeEach
@@ -223,7 +213,7 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Imprimir ranking con clientes cargados")
         void testImprimirRankingConDatos() {
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
 
             String output = capturedOutput.toString();
             assertTrue(output.contains("RANKING DE CLIENTES"),
@@ -233,7 +223,7 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Ranking muestra clientes ordenados por scoring")
         void testRankingOrdenPorScoring() {
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
 
             String output = capturedOutput.toString();
             // El ranking debe mostrar los clientes
@@ -249,7 +239,7 @@ class RedSocialManagerTest {
             ByteArrayOutputStream vacios = new ByteArrayOutputStream();
             System.setOut(new PrintStream(vacios));
 
-            vacio.imprimirRanking();
+            vacio.imprimirRankingCompleto();
 
             System.setOut(standardOut);
             String output = vacios.toString();
@@ -260,7 +250,7 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Ranking contiene clientes esperados")
         void testRankingContieneDatos() {
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
 
             String output = capturedOutput.toString();
             // Los clientes deben estar en el output
@@ -271,13 +261,13 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Imprimir ranking múltiples veces")
         void testImprimirRankingMultipleVeces() {
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
             ByteArrayOutputStream firstOutput = capturedOutput;
 
             capturedOutput = new ByteArrayOutputStream();
             System.setOut(new PrintStream(capturedOutput));
 
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
 
             System.setOut(standardOut);
             // Ambas llamadas deben producir output
@@ -288,7 +278,7 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Ranking utiliza el formato esperado")
         void testFormatoRanking() {
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
 
             String output = capturedOutput.toString();
             // Debe usar el formato de árbol (TreeMap ordenado)
@@ -307,19 +297,19 @@ class RedSocialManagerTest {
             // Cargar
             redSocialManager.cargarDesdeArchivo("clientes_test.json");
             String loadOutput = capturedOutput.toString();
-            assertTrue(loadOutput.contains("LOG: Carga completada"));
+            assertTrue(loadOutput.contains("LOG: Carga de clientes completada"));
 
             // Buscar
             capturedOutput = new ByteArrayOutputStream();
             System.setOut(new PrintStream(capturedOutput));
             redSocialManager.buscarYMostrarCliente("Juan");
             String searchOutput = capturedOutput.toString();
-            assertTrue(searchOutput.contains("Cliente encontrado"));
+            assertTrue(searchOutput.contains("Encontrado por Nombre"));
 
             // Ranking
             capturedOutput = new ByteArrayOutputStream();
             System.setOut(new PrintStream(capturedOutput));
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
             String rankOutput = capturedOutput.toString();
             assertTrue(rankOutput.contains("RANKING"));
 
@@ -341,7 +331,7 @@ class RedSocialManagerTest {
                 redSocialManager.buscarYMostrarCliente(nombre);
 
                 String output = tempOutput.toString();
-                if (output.contains("Cliente encontrado")) {
+                if (output.contains("Encontrado por Nombre")) {
                     encontrados++;
                 }
             }
@@ -352,7 +342,8 @@ class RedSocialManagerTest {
 
         @Test
         @DisplayName("Cargar, buscar inexistente, luego ranking")
-        void testCargarBuscarInexistenteRanking() {
+        void
+        testCargarBuscarInexistenteRanking() {
             redSocialManager.cargarDesdeArchivo("clientes_test.json");
 
             capturedOutput = new ByteArrayOutputStream();
@@ -364,7 +355,7 @@ class RedSocialManagerTest {
 
             capturedOutput = new ByteArrayOutputStream();
             System.setOut(new PrintStream(capturedOutput));
-            redSocialManager.imprimirRanking();
+            redSocialManager.imprimirRankingCompleto();
 
             System.setOut(standardOut);
             String rankOutput = capturedOutput.toString();
@@ -383,7 +374,7 @@ class RedSocialManagerTest {
 
             System.setOut(standardOut);
             String output = capturedOutput.toString();
-            assertTrue(output.contains("Cliente encontrado"),
+            assertTrue(output.contains("Encontrado por Nombre"),
                     "Debe encontrar cliente después de múltiples cargas");
         }
 
@@ -414,27 +405,21 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Cargar con rutas relativas")
         void testCargarRutaRelativa() {
-            assertDoesNotThrow(() -> {
-                redSocialManager.cargarDesdeArchivo("clientes_test.json");
-            }, "Debe manejar rutas relativas");
+            assertDoesNotThrow(() -> redSocialManager.cargarDesdeArchivo("clientes_test.json"), "Debe manejar rutas relativas");
         }
 
         @Test
         @DisplayName("Cargar con rutas absolutas")
         void testCargarRutaAbsoluta() {
             String rutaAbsoluta = System.getProperty("user.dir") + "/clientes_test.json";
-            assertDoesNotThrow(() -> {
-                redSocialManager.cargarDesdeArchivo(rutaAbsoluta);
-            }, "Debe manejar rutas absolutas");
+            assertDoesNotThrow(() -> redSocialManager.cargarDesdeArchivo(rutaAbsoluta), "Debe manejar rutas absolutas");
         }
 
         @Test
         @DisplayName("Cargar con nombre de archivo especial")
         void testCargarNombreEspecial() {
             // No debe lanzar excepción incluso si el archivo no existe
-            assertDoesNotThrow(() -> {
-                redSocialManager.cargarDesdeArchivo("archivo @#$%^&().json");
-            });
+            assertDoesNotThrow(() -> redSocialManager.cargarDesdeArchivo("archivo @#$%^&().json"));
         }
 
         @Test

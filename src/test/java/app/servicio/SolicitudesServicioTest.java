@@ -2,11 +2,7 @@ package app.servicio;
 
 import app.interfaces.ColaTDA;
 import app.modelo.Solicitud;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InOrder;
 
 import java.io.ByteArrayOutputStream;
@@ -112,9 +108,7 @@ class SolicitudesServicioTest {
             when(colaMock.ColaVacia()).thenReturn(false);
             when(colaMock.Primero()).thenReturn(solicitud);
 
-            assertDoesNotThrow(() -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            assertDoesNotThrow(() -> SolicitudesServicio.procesarSiguiente(colaMock, true));
 
             String output = capturedOutput.toString();
             assertTrue(output.contains("ACEPTADA"),
@@ -232,9 +226,7 @@ class SolicitudesServicioTest {
             ColaTDA<Solicitud> colaMock = mock(ColaTDA.class);
             when(colaMock.ColaVacia()).thenReturn(true);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            }, "Debe lanzar RuntimeException cuando la cola está vacía");
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> SolicitudesServicio.procesarSiguiente(colaMock, true), "Debe lanzar RuntimeException cuando la cola está vacía");
 
             assertTrue(exception.getMessage().contains("No hay solicitudes pendientes"),
                     "El mensaje debe indicar que no hay solicitudes");
@@ -246,9 +238,7 @@ class SolicitudesServicioTest {
             ColaTDA<Solicitud> colaMock = mock(ColaTDA.class);
             when(colaMock.ColaVacia()).thenReturn(true);
 
-            assertThrows(RuntimeException.class, () -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            assertThrows(RuntimeException.class, () -> SolicitudesServicio.procesarSiguiente(colaMock, true));
 
             verify(colaMock, never()).Primero();
             verify(colaMock, never()).Desacolar();
@@ -260,9 +250,7 @@ class SolicitudesServicioTest {
             ColaTDA<Solicitud> colaMock = mock(ColaTDA.class);
             when(colaMock.ColaVacia()).thenReturn(true);
 
-            assertThrows(RuntimeException.class, () -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, false);
-            });
+            assertThrows(RuntimeException.class, () -> SolicitudesServicio.procesarSiguiente(colaMock, false));
 
             verify(colaMock, never()).Primero();
             verify(colaMock, never()).Desacolar();
@@ -274,9 +262,7 @@ class SolicitudesServicioTest {
             ColaTDA<Solicitud> colaMock = mock(ColaTDA.class);
             when(colaMock.ColaVacia()).thenReturn(true);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            RuntimeException exception = assertThrows(RuntimeException.class, () -> SolicitudesServicio.procesarSiguiente(colaMock, true));
 
             assertEquals("No hay solicitudes pendientes.", exception.getMessage(),
                     "El mensaje debe ser exacto");
@@ -358,9 +344,7 @@ class SolicitudesServicioTest {
             when(colaMock.ColaVacia()).thenReturn(false);
             when(colaMock.Primero()).thenReturn(solicitud);
 
-            assertDoesNotThrow(() -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            assertDoesNotThrow(() -> SolicitudesServicio.procesarSiguiente(colaMock, true));
 
             String output = capturedOutput.toString();
             assertTrue(output.contains("ACEPTADA"),
@@ -376,9 +360,7 @@ class SolicitudesServicioTest {
             when(colaMock.ColaVacia()).thenReturn(false);
             when(colaMock.Primero()).thenReturn(solicitud);
 
-            assertDoesNotThrow(() -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            assertDoesNotThrow(() -> SolicitudesServicio.procesarSiguiente(colaMock, true));
 
             verify(colaMock).Desacolar();
         }
@@ -392,9 +374,7 @@ class SolicitudesServicioTest {
             when(colaMock.ColaVacia()).thenReturn(false);
             when(colaMock.Primero()).thenReturn(solicitud);
 
-            assertDoesNotThrow(() -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            assertDoesNotThrow(() -> SolicitudesServicio.procesarSiguiente(colaMock, true));
 
             String output = capturedOutput.toString();
             assertTrue(output.contains("ACEPTADA: Juan -> Juan"),
@@ -411,9 +391,7 @@ class SolicitudesServicioTest {
             when(colaMock.ColaVacia()).thenReturn(false);
             when(colaMock.Primero()).thenReturn(solicitud);
 
-            assertDoesNotThrow(() -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            assertDoesNotThrow(() -> SolicitudesServicio.procesarSiguiente(colaMock, true));
 
             verify(colaMock).Desacolar();
         }
@@ -504,9 +482,7 @@ class SolicitudesServicioTest {
             SolicitudesServicio.procesarSiguiente(colaMock, true);
 
             // Segunda llamada debe fallar
-            assertThrows(RuntimeException.class, () -> {
-                SolicitudesServicio.procesarSiguiente(colaMock, true);
-            });
+            assertThrows(RuntimeException.class, () -> SolicitudesServicio.procesarSiguiente(colaMock, true));
         }
     }
 
