@@ -1,32 +1,68 @@
 package app;
 
-// Busqueda por nombres: HashMap <String, Cliente> = O(1)
-// Busqueda por scoring: TreeMap <Integer, Integer> = O(log n) (HashMap desordenaria esto)
-// Historial de acciones: Stack <Accion> o Deque(Accion) = O(1)
-// Solicitudes de Seguimiento: Queue <Solicitud> Para procesar en orden FIFO O(1)
-
-/*
- * Punto de entrada del programa.
- * Orquesta la inicialización de los servicios y lanza la interfaz de usuario.
- */
-
+import app.servicio.HistorialServicio;
 import app.servicio.RedSocialManager;
 
+import java.util.Scanner;
+
 public class Main {
-    static void main(String[] args) {
-        RedSocialManager sistema = new RedSocialManager();
 
-        // 1. Se cargan los datos
-        String rutaJson = "Clientes.json";
-        sistema.cargarDesdeArchivo(rutaJson);
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
 
-        // 2. Busqueda de personas en O(1) | HashMap
-        System.out.println("\n--- Prueba de Búsqueda ---");
-        sistema.buscarYMostrarCliente("Messi"); // No existe
-        sistema.buscarYMostrarCliente("Alice"); // Si existe en el json
+        RedSocialManager manager = new RedSocialManager(); // :contentReference[oaicite:2]{index=2}
+        HistorialServicio historial = new HistorialServicio(); // :contentReference[oaicite:3]{index=3}
 
-        // 3. Busqueda de ranking O(log n) | TreeMap
-        System.out.println("\n--- Prueba de Ranking ---");
-        sistema.imprimirRankingCompleto();
+        boolean salir = false;
+
+        while (!salir) {
+            System.out.println("\n=== RED SOCIAL - MENÚ ===");
+            System.out.println("1) Cargar clientes desde JSON");
+            System.out.println("2) Buscar cliente por nombre");
+            System.out.println("3) Buscar clientes por scoring");
+            System.out.println("4) Mostrar ranking completo");
+            System.out.println("5) Deshacer última acción");
+            System.out.println("6) Mostrar historial");
+            System.out.println("0) Salir");
+            System.out.print("Opción: ");
+
+            String opcion = sc.nextLine().trim();
+
+            try {
+                switch (opcion) {
+                    case "1" -> {
+                        System.out.print("Cargando archivo Clientes.json... ");
+                        String ruta = "Clientes.json";
+                        manager.cargarDesdeArchivo(ruta);
+                        historial.registrarAccion("CargarJSON", "Se cargó el archivo: " + ruta);
+                    }
+                    case "2" -> {
+                        System.out.print("Nombre a buscar: ");
+                        String nombre = sc.nextLine().trim();
+                        manager.buscarYMostrarCliente(nombre);
+                        historial.registrarAccion("BuscarPorNombre", "Búsqueda de: " + nombre);
+                    }
+                    case "3" -> {
+                        System.out.print("Scoring a buscar (entero): ");
+                        int scoring = Integer.parseInt(sc.nextLine().trim());
+                        manager.buscarYMostrarPorScoring(scoring);
+                        historial.registrarAccion("BuscarPorScoring", "Búsqueda de scoring: " + scoring);
+                    }
+                    case "4" -> {
+                        manager.imprimirRankingCompleto();
+                        historial.registrarAccion("MostrarRanking", "Se mostró el ranking completo");
+                    }
+                    case "5" -> historial.deshacerUltimaAccion();
+                    case "6" -> historial.mostrarHistorial();
+                    case "0" -> salir = true;
+                    default -> System.out.println("Opción inválida.");
+                }
+            } catch (Exception e) {
+                System.out.println("ERROR: " + e.getMessage());
+            }
+        }
+
+        System.out.println("Fin del programa.");
+        sc.close();
     }
 }
