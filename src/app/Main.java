@@ -20,176 +20,123 @@ public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
+        // Al instanciarse, el manager ya carga el JSON automáticamente (Punto 4)
         RedSocialManager manager = new RedSocialManager();
         HistorialServicio historial = new HistorialServicio();
 
+        // Estructura para solicitudes pendientes (Punto 3)
         ColaTDA<Solicitud> pendientes = new ColaLD<>();
         pendientes.InicializarCola();
 
-        // Para evitar duplicados y permitir reintento solo si fue rechazada
+        // Control de estados para evitar duplicados
         Set<String> pendientesSet = new HashSet<>();
         Set<String> aceptadasSet = new HashSet<>();
         Set<String> rechazadasSet = new HashSet<>();
 
         boolean salir = false;
-        boolean clientesCargados = false;
+
+        System.out.println("======================================");
+        System.out.println("   SISTEMA DE RED SOCIAL INICIADO     ");
+        System.out.println("======================================");
 
         while (!salir) {
-            System.out.println("\n=== RED SOCIAL - MENÚ ===");
-            System.out.println("1) Cargar clientes desde JSON (Clientes.json)");
-            System.out.println("2) Buscar cliente por nombre");
-            System.out.println("3) Buscar clientes por scoring");
-            System.out.println("4) Mostrar ranking completo");
-            System.out.println("5) Deshacer última acción");
-            System.out.println("6) Mostrar historial");
-            System.out.println("--- Solicitudes de seguimiento ---");
-            System.out.println("7) Enviar solicitud (encolar)");
-            System.out.println("8) Ver próxima solicitud");
-            System.out.println("9) Aceptar próxima solicitud");
-            System.out.println("10) Rechazar próxima solicitud");
+            System.out.println("\n=== MENÚ PRINCIPAL ===");
+            System.out.println("1) Buscar cliente por nombre");
+            System.out.println("2) Buscar clientes por scoring");
+            System.out.println("3) Mostrar ranking completo (Prioridad)");
+            System.out.println("4) Deshacer última acción (Pila)");
+            System.out.println("5) Mostrar historial completo");
+            System.out.println("--- Gestión de Solicitudes ---");
+            System.out.println("6) Enviar solicitud de seguimiento");
+            System.out.println("7) Ver próxima solicitud en cola");
+            System.out.println("8) Aceptar próxima solicitud");
+            System.out.println("9) Rechazar próxima solicitud");
             System.out.println("0) Salir");
-            System.out.print("Opción: ");
+            System.out.print("Seleccione una opción: ");
 
             String opcion = sc.nextLine().trim();
 
             try {
                 switch (opcion) {
                     case "1" -> {
-                        System.out.println("Cargando archivo Clientes.json...");
-                        String ruta = "Clientes.json";
-                        manager.cargarDesdeArchivo(ruta);
-                        clientesCargados = true;
-                        historial.registrarAccion("CargarJSON", "Se cargó el archivo: " + ruta);
-                    }
-
-                    case "2" -> {
-                        if (!clientesCargados) {
-                            System.out.println("Primero cargá clientes (opción 1).");
-                            break;
-                        }
                         System.out.print("Nombre a buscar: ");
                         String nombre = sc.nextLine().trim();
                         manager.buscarYMostrarCliente(nombre);
-                        historial.registrarAccion("BuscarPorNombre", "Búsqueda de: " + nombre);
+                        historial.registrarAccion("BuscarNombre", "Búsqueda: " + nombre);
+                    }
+
+                    case "2" -> {
+                        System.out.print("Scoring exacto a buscar: ");
+                        int scoring = Integer.parseInt(sc.nextLine().trim());
+                        manager.buscarYMostrarPorScoring(scoring);
+                        historial.registrarAccion("BuscarScoring", "Scoring: " + scoring);
                     }
 
                     case "3" -> {
-                        if (!clientesCargados) {
-                            System.out.println("Primero cargá clientes (opción 1).");
-                            break;
-                        }
-                        System.out.print("Scoring a buscar (entero): ");
-                        int scoring = Integer.parseInt(sc.nextLine().trim());
-                        manager.buscarYMostrarPorScoring(scoring);
-                        historial.registrarAccion("BuscarPorScoring", "Búsqueda de scoring: " + scoring);
-                    }
-
-                    case "4" -> {
-                        if (!clientesCargados) {
-                            System.out.println("Primero cargá clientes (opción 1).");
-                            break;
-                        }
                         manager.imprimirRankingCompleto();
-                        historial.registrarAccion("MostrarRanking", "Se mostró el ranking completo");
+                        historial.registrarAccion("VerRanking", "Consulta de ranking");
                     }
 
-                    case "5" -> historial.deshacerUltimaAccion();
-                    case "6" -> historial.mostrarHistorial();
+                    case "4" -> historial.deshacerUltimaAccion();
 
-                    // ====== SOLICITUDES ======
-                    case "7" -> {
-                        System.out.print("Seguidor (quién quiere seguir): ");
+                    case "5" -> historial.mostrarHistorial();
+
+                    case "6" -> {
+                        System.out.print("Tu nombre (Emisor): ");
                         String seguidor = sc.nextLine().trim();
-                        System.out.print("Seguido (a quién quiere seguir): ");
+                        System.out.print("Nombre a seguir (Receptor): ");
                         String seguido = sc.nextLine().trim();
 
                         if (seguidor.equalsIgnoreCase(seguido)) {
-                            System.out.println("No podés enviarte una solicitud a vos mismo.");
+                            System.out.println("Error: No puedes seguirte a ti mismo.");
                             break;
                         }
 
-                        String k = key(seguidor, seguido);
+                        SolicitudesServicio.enviarSolicitud(pendientes, seguidor, seguido, manager.getRepositorio());
+                        historial.registrarAccion("EnviarSolicitud", "De " + seguidor + " a " + seguido);
+                    }
 
-                        // Regla: no permitir duplicar si ya está pendiente o fue aceptada.
-                        // Solo permitir repetir si estaba en rechazadas (y ahí la sacamos de rechazadas y la volvemos a encolar).
-                        if (pendientesSet.contains(k)) {
-                            System.out.println("Ya existe una solicitud PENDIENTE entre esas personas.");
-                            break;
+                    case "7" -> {
+                        if (pendientes.ColaVacia()) {
+                            System.out.println("No hay solicitudes en la cola.");
+                        } else {
+                            System.out.println("Siguiente en espera: " + pendientes.Primero());
                         }
-                        if (aceptadasSet.contains(k)) {
-                            System.out.println("Esa solicitud ya fue ACEPTADA anteriormente. No se puede volver a generar.");
-                            break;
-                        }
-
-                        // Si estaba rechazada, permitimos reintento
-                        if (rechazadasSet.contains(k)) {
-                            rechazadasSet.remove(k);
-                        }
-
-                        Solicitud s = new Solicitud(seguidor, seguido); // :contentReference[oaicite:1]{index=1}
-                        pendientes.Acolar(s);
-                        pendientesSet.add(k);
-
-                        System.out.println("Solicitud enviada: " + s);
-                        historial.registrarAccion("EncolarSolicitud", "Se encoló: " + s);
                     }
 
                     case "8" -> {
                         if (pendientes.ColaVacia()) {
-                            System.out.println("No hay solicitudes pendientes.");
-                        } else {
-                            System.out.println("Próxima solicitud: " + pendientes.Primero());
+                            System.out.println("Cola vacía.");
+                            break;
                         }
+                        Solicitud s = pendientes.Primero();
+
+                        SolicitudesServicio.procesarSiguiente(pendientes, true);
+
+                        historial.registrarAccion("AceptarSolicitud", "Aceptada: " + s);
                     }
 
                     case "9" -> {
                         if (pendientes.ColaVacia()) {
-                            System.out.println("No hay solicitudes pendientes.");
+                            System.out.println("Cola vacía.");
                             break;
                         }
-
-                        // Tomo la solicitud antes de procesarla para actualizar los sets
                         Solicitud s = pendientes.Primero();
-                        String k = key(s.seguidor(), s.seguido());
 
-                        // Esto IMPRIME y DESACOLA siempre :contentReference[oaicite:2]{index=2}
-                        SolicitudesServicio.procesarSiguiente(pendientes, true);
-
-                        // Actualizo control de duplicados
-                        pendientesSet.remove(k);
-                        aceptadasSet.add(k);
-
-                        historial.registrarAccion("AceptarSolicitud", "Se aceptó: " + s);
-                    }
-
-                    case "10" -> {
-                        if (pendientes.ColaVacia()) {
-                            System.out.println("No hay solicitudes pendientes.");
-                            break;
-                        }
-
-                        Solicitud s = pendientes.Primero();
-                        String k = key(s.seguidor(), s.seguido());
-
-                        // Esto IMPRIME y DESACOLA siempre :contentReference[oaicite:3]{index=3}
                         SolicitudesServicio.procesarSiguiente(pendientes, false);
 
-                        pendientesSet.remove(k);
-                        rechazadasSet.add(k);
-
-                        historial.registrarAccion("RechazarSolicitud", "Se rechazó: " + s);
+                        historial.registrarAccion("RechazarSolicitud", "Rechazada: " + s);
                     }
 
                     case "0" -> salir = true;
-                    default -> System.out.println("Opción inválida.");
+                    default -> System.out.println("Opción no válida.");
                 }
             } catch (Exception e) {
-                System.out.println("ERROR: " + e.getMessage());
+                System.out.println("Ocurrió un error: " + e.getMessage());
             }
         }
 
-        System.out.println("Fin del programa.");
+        System.out.println("Programa finalizado. ¡Hasta luego!");
         sc.close();
     }
 }
-

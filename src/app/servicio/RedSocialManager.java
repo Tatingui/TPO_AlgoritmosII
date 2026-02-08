@@ -7,11 +7,28 @@ import app.repositorio.ClienteRepositorio;
 
 public class RedSocialManager {
     private final ClienteRepositorio repositorio;
-    private final JsonLoader loader;
+    private final JsonLoader loader; // Si lo usabas abajo, no lo borres
+
+    private final HistorialServicio historialServicio;
+    private final SolicitudesServicio solicitudesServicio;
 
     public RedSocialManager() {
         this.repositorio = new ClienteRepositorio();
         this.loader = new JsonLoader();
+        this.historialServicio = new HistorialServicio();
+        this.solicitudesServicio = new SolicitudesServicio();
+
+        System.out.println("[SISTEMA] Iniciando Red Social...");
+        inicializarDatos();
+    }
+
+    private void inicializarDatos() {
+        try {
+            this.cargarDesdeArchivo("clientes.json");
+            System.out.println("[SISTEMA] Datos cargados automáticamente.");
+        } catch (Exception e) {
+            System.err.println("[ERROR] No se pudo cargar automáticamente.");
+        }
     }
 
     public void cargarDesdeArchivo(String ruta) {
@@ -27,7 +44,6 @@ public class RedSocialManager {
         }
     }
 
-    // Cumple: Búsqueda por nombre
     public void buscarYMostrarCliente(String nombre) {
         if (nombre == null) {
             throw new IllegalArgumentException("El nombre tiene que ser un valor no nulo");
@@ -40,7 +56,6 @@ public class RedSocialManager {
         }
     }
 
-    // Cumple: Búsqueda por scoring (Usa la Cola de Prioridad del Repositorio)
     public void buscarYMostrarPorScoring(int scoringBuscado) {
         System.out.println("--- Buscando clientes con scoring: " + scoringBuscado + " ---");
         repositorio.buscarPorScoring(scoringBuscado);
@@ -48,5 +63,9 @@ public class RedSocialManager {
 
     public void imprimirRankingCompleto() {
         repositorio.mostrarRanking();
+    }
+
+    public ClienteRepositorio getRepositorio() {
+        return this.repositorio; // O clienteRepositorio, según el nombre que le dejaste
     }
 }
