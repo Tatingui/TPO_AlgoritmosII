@@ -1,26 +1,27 @@
 package app.servicio;
 
 import app.implementaciones.PilaLD;
-import app.modelo.Accion;
+import app.interfaces.PilaTDA;
+import app.modelo.Cliente;
 import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Pruebas de HistorialServicio")
+@DisplayName("Pruebas Completas de HistorialServicio")
 class HistorialServicioTest {
 
     private final PrintStream standardOut = System.out;
-    private HistorialServicio historialServicio;
     private ByteArrayOutputStream capturedOutput;
+    private Cliente clientePrueba;
 
     @BeforeEach
     void setUp() {
-        historialServicio = new HistorialServicio();
+        // Inicializamos el cliente que actuará como contenedor del historial
+        clientePrueba = new Cliente("TestUser", 100, new ArrayList<>(), new ArrayList<>());
         capturedOutput = new ByteArrayOutputStream();
         System.setOut(new PrintStream(capturedOutput));
     }
@@ -31,388 +32,151 @@ class HistorialServicioTest {
     }
 
     /**
-     * Extrae el historial interno de manera segura para verificación.
-     * Utiliza reflexión para acceder al campo privado.
-     */
-    private PilaLD<Accion> extraerHistorial() {
-        try {
-            var field = HistorialServicio.class.getDeclaredField("historial");
-            field.setAccessible(true);
-            return (PilaLD<Accion>) field.get(historialServicio);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail("No se pudo acceder al historial: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Cuenta el número de acciones en la pila sin modificarla.
+     * Auxiliar para contar elementos en la pila sin destruirla.
      */
     private int contarAccionesEnPila() {
-        try {
-            PilaLD<Accion> pila = extraerHistorial();
-            int contador = 0;
-            PilaLD<Accion> temp = new PilaLD<>();
-            temp.InicializarPila();
+        PilaTDA<String> pila = clientePrueba.getHistorial();
+        int contador = 0;
+        PilaTDA<String> temp = new PilaLD<>();
+        temp.InicializarPila();
 
-            while (!pila.PilaVacia()) {
-                contador++;
-                temp.Apilar(pila.Tope());
-                pila.Desapilar();
-            }
-
-            // Restaurar el estado original
-            while (!temp.PilaVacia()) {
-                pila.Apilar(temp.Tope());
-                temp.Desapilar();
-            }
-
-            return contador;
-        } catch (Exception e) {
-            fail("Error al contar acciones: " + e.getMessage());
-            return -1;
+        while (!pila.PilaVacia()) {
+            contador++;
+            temp.Apilar(pila.Tope());
+            pila.Desapilar();
         }
+        while (!temp.PilaVacia()) {
+            pila.Apilar(temp.Tope());
+            temp.Desapilar();
+        }
+        return contador;
     }
 
     @Nested
-    @DisplayName("Pruebas de registrarAccion")
-    class RegistrarAccionTests {
+    @DisplayName("Pruebas de Registro de Acciones")
+    class RegistroTests {
 
         @Test
-        @DisplayName("Registrar una acción simple")
-        void testRegistrarUnaSola() {
-            historialServicio.registrarAccion("AgregarAmigo", "Se agregó a Juan");
-            System.setOut(standardOut);
-
-            assertDoesNotThrow(() -> {
-                PilaLD<Accion> tempPila = extraerHistorial();
-                assertFalse(tempPila.PilaVacia(), "La pila debe contener la acción registrada");
-            });
-        }
-
-        @Test
-        @DisplayName("Registrar múltiples acciones")
+        @DisplayName("Registrar múltiples acciones preservando el orden")
         void testRegistrarMultiples() {
-            historialServicio.registrarAccion("AgregarAmigo", "Se agregó a Juan");
-            historialServicio.registrarAccion("PublicarEstado", "Nuevo estado publicado");
-            historialServicio.registrarAccion("EnviarMensaje", "Mensaje enviado a Pedro");
+            clientePrueba.getHistorial().Apilar("Accion 1");
+            clientePrueba.getHistorial().Apilar("Accion 2");
+            clientePrueba.getHistorial().Apilar("Accion 3");
 
-            System.setOut(standardOut);
-            assertEquals(3, contarAccionesEnPila(), "Debe haber 3 acciones en el historial");
+            assertEquals(3, contarAccionesEnPila(), "Debe haber exactamente 3 acciones");
+            assertEquals("Accion 3", clientePrueba.getHistorial().Tope(), "El tope debe ser la última ingresada (LIFO)");
         }
 
         @Test
-        @DisplayName("Registrar acciones con diferentes tipos y descripciones")
-        void testRegistrarAccionesVariadas() {
-            String[] tipos = {"AgregarAmigo", "PublicarEstado", "EnviarMensaje", "EliminarContacto"};
-            String[] descripciones = {"Amigo agregado", "Publicación hecha", "Mensaje enviado", "Contacto eliminado"};
-
-            for (int i = 0; i < tipos.length; i++) {
-                historialServicio.registrarAccion(tipos[i], descripciones[i]);
-            }
-
-            System.setOut(standardOut);
-            assertEquals(4, contarAccionesEnPila(), "Debe haber 4 acciones registradas");
+        @DisplayName("Registrar con Strings vacíos")
+        void testRegistrarAccionVacia() {
+            clientePrueba.getHistorial().Apilar("");
+            assertEquals(1, contarAccionesEnPila(), "Debe registrarse aunque sea un string vacío");
         }
 
         @Test
-        @DisplayName("Registrar acción con valores null")
-        void testRegistrarAccionConValoresNull() {
-            assertDoesNotThrow(() -> {
-                historialServicio.registrarAccion(null, "descripción");
-                historialServicio.registrarAccion("tipo", null);
-            });
-        }
-
-        @Test
-        @DisplayName("Registrar acción con strings vacíos")
-        void testRegistrarAccionConStringsVacios() {
-            historialServicio.registrarAccion("", "");
-            System.setOut(standardOut);
-
-            assertEquals(1, contarAccionesEnPila(), "Debe registrarse aunque sean strings vacíos");
-        }
-
-        @Test
-        @DisplayName("Timestamp se registra correctamente")
-        void testTimestampRegistrado() {
-            LocalDateTime antesDeRegistro = LocalDateTime.now();
-            historialServicio.registrarAccion("Test", "Test descripción");
-            LocalDateTime despuesDeRegistro = LocalDateTime.now();
-
-            System.setOut(standardOut);
-            PilaLD<Accion> tempPila = extraerHistorial();
-
-            if (!tempPila.PilaVacia()) {
-                Accion accion = tempPila.Tope();
-                assertTrue(accion.timestamp().isAfter(antesDeRegistro.minusSeconds(1)),
-                        "Timestamp debe estar después del antes");
-                assertTrue(accion.timestamp().isBefore(despuesDeRegistro.plusSeconds(1)),
-                        "Timestamp debe estar antes del después");
-            }
+        @DisplayName("Registrar valor null")
+        void testRegistrarNull() {
+            // En TDAs de la cátedra, apilar null puede ser un problema dependiendo de la implementación
+            // Verificamos que no rompa el flujo
+            assertDoesNotThrow(() -> clientePrueba.getHistorial().Apilar(null));
         }
     }
 
     @Nested
-    @DisplayName("Pruebas de deshacerUltimaAccion")
-    class DeshacerUltimaAccionTests {
+    @DisplayName("Pruebas de Deshacer (Undo)")
+    class DeshacerTests {
 
         @Test
-        @DisplayName("Deshacer cuando el historial está vacío")
-        void testDeshacerEnHistorialVacio() {
-            historialServicio.deshacerUltimaAccion();
-
+        @DisplayName("Deshacer en historial vacío")
+        void testDeshacerVacio() {
+            HistorialServicio.deshacerUltimaAccion(clientePrueba.getHistorial());
             String output = capturedOutput.toString();
-            assertTrue(output.contains("No hay acciones para deshacer"),
-                    "Debe mostrar mensaje cuando no hay acciones");
+            assertTrue(output.contains("No hay acciones"), "Debe informar que no hay nada para deshacer");
         }
 
         @Test
-        @DisplayName("Deshacer una acción")
-        void testDeshacerUnaAccion() {
-            historialServicio.registrarAccion("AgregarAmigo", "Se agregó a Juan");
-            historialServicio.deshacerUltimaAccion();
+        @DisplayName("Deshacer quita el elemento correcto (LIFO)")
+        void testDeshacerOrdenLIFO() {
+            clientePrueba.getHistorial().Apilar("Primera");
+            clientePrueba.getHistorial().Apilar("Segunda");
 
-            String output = capturedOutput.toString();
-            assertTrue(output.contains("Deshaciendo acción"),
-                    "Debe mostrar mensaje de deshacimiento");
-            assertEquals(0, contarAccionesEnPila(), "La pila debe estar vacía después de deshacer");
+            HistorialServicio.deshacerUltimaAccion(clientePrueba.getHistorial());
+
+            assertEquals(1, contarAccionesEnPila());
+            assertEquals("Primera", clientePrueba.getHistorial().Tope(), "Debe quedar la primera acción");
         }
 
         @Test
-        @DisplayName("Deshacer múltiples acciones en orden LIFO")
-        void testDeshacerMultiplesAcciones() {
-            historialServicio.registrarAccion("Acción 1", "Primera");
-            historialServicio.registrarAccion("Acción 2", "Segunda");
-            historialServicio.registrarAccion("Acción 3", "Tercera");
+        @DisplayName("Deshacer más veces de las posibles")
+        void testDeshacerExcesivo() {
+            clientePrueba.getHistorial().Apilar("Única");
 
-            // Deshacer 3 veces
-            historialServicio.deshacerUltimaAccion();
-            historialServicio.deshacerUltimaAccion();
-            historialServicio.deshacerUltimaAccion();
-
-            System.setOut(standardOut);
-            assertEquals(0, contarAccionesEnPila(), "La pila debe estar vacía después de deshacer todas");
-        }
-
-        @Test
-        @DisplayName("Deshacer actúa sobre la última acción (LIFO)")
-        void testDeshacerUltimaEnOrdenLIFO() {
-            historialServicio.registrarAccion("Primera", "Desc1");
-            historialServicio.registrarAccion("Segunda", "Desc2");
-            historialServicio.registrarAccion("Tercera", "Desc3");
-
-            // Capturar el mensaje de deshacimiento
-            historialServicio.deshacerUltimaAccion();
+            HistorialServicio.deshacerUltimaAccion(clientePrueba.getHistorial()); // Queda vacía
+            HistorialServicio.deshacerUltimaAccion(clientePrueba.getHistorial()); // Intenta en vacío
 
             String output = capturedOutput.toString();
-            assertTrue(output.contains("Tercera"),
-                    "Debe deshacer la última acción (Tercera)");
-        }
-
-        @Test
-        @DisplayName("Deshacer más acciones de las que existen")
-        void testDeshacerMasAccionesDelimite() {
-            historialServicio.registrarAccion("Única", "Única acción");
-
-            historialServicio.deshacerUltimaAccion();
-            historialServicio.deshacerUltimaAccion(); // Segunda vez en vacío
-
-            String output = capturedOutput.toString();
-            assertTrue(output.contains("No hay acciones para deshacer"),
-                    "Debe indicar que no hay acciones al intentar deshacer de nuevo");
-        }
-
-        @Test
-        @DisplayName("Deshacimiento imprime información correcta")
-        void testMensajeDeshacimiento() {
-            historialServicio.registrarAccion("TestTipo", "TestDescripción");
-            historialServicio.deshacerUltimaAccion();
-
-            String output = capturedOutput.toString();
-            assertTrue(output.contains("Deshaciendo acción") && output.contains("TestTipo"),
-                    "Debe imprimir el tipo de acción deshecha");
+            assertTrue(output.contains("No hay acciones"), "Debe manejar el vaciado total");
+            assertEquals(0, contarAccionesEnPila());
         }
     }
 
-    // ==================== MÉTODOS AUXILIARES ====================
-
     @Nested
-    @DisplayName("Pruebas de mostrarHistorial")
-    class MostrarHistorialTests {
+    @DisplayName("Pruebas de Visualización")
+    class MostrarTests {
+
+        @Test
+        @DisplayName("Mostrar historial no debe destruir los datos")
+        void testMostrarNoDestructivo() {
+            clientePrueba.getHistorial().Apilar("Accion A");
+            clientePrueba.getHistorial().Apilar("Accion B");
+
+            int antes = contarAccionesEnPila();
+            HistorialServicio.mostrarHistorialPersonal(clientePrueba.getHistorial());
+            int despues = contarAccionesEnPila();
+
+            assertEquals(antes, despues, "Mostrar historial no debe vaciar la pila");
+        }
 
         @Test
         @DisplayName("Mostrar historial vacío")
-        void testMostrarHistorialVacio() {
-            historialServicio.mostrarHistorial();
-
+        void testMostrarVacio() {
+            HistorialServicio.mostrarHistorialPersonal(clientePrueba.getHistorial());
             String output = capturedOutput.toString();
-            assertTrue(output.contains("Historial de acciones"),
-                    "Debe mostrar encabezado del historial");
+            assertTrue(output.contains("Historial de acciones"), "Debe mostrar el encabezado");
         }
 
         @Test
-        @DisplayName("Mostrar una acción en historial")
-        void testMostrarUnaAccion() {
-            historialServicio.registrarAccion("TestTipo", "TestDescripcion");
-            historialServicio.mostrarHistorial();
+        @DisplayName("Verificar orden LIFO al mostrar")
+        void testOrdenAlMostrar() {
+            clientePrueba.getHistorial().Apilar("Vieja");
+            clientePrueba.getHistorial().Apilar("Nueva");
 
+            HistorialServicio.mostrarHistorialPersonal(clientePrueba.getHistorial());
             String output = capturedOutput.toString();
-            assertTrue(output.contains("TestTipo") && output.contains("TestDescripcion"),
-                    "Debe mostrar la acción registrada");
-        }
 
-        @Test
-        @DisplayName("Mostrar múltiples acciones en historial")
-        void testMostrarMultiplesAcciones() {
-            historialServicio.registrarAccion("Accion 1", "Descripcion 1");
-            historialServicio.registrarAccion("Accion 2", "Descripcion 2");
-            historialServicio.registrarAccion("Accion 3", "Descripcion 3");
+            int posNueva = output.indexOf("Nueva");
+            int posVieja = output.indexOf("Vieja");
 
-            historialServicio.mostrarHistorial();
-
-            String output = capturedOutput.toString();
-            assertTrue(output.contains("Accion 1") && output.contains("Accion 2") && output.contains("Accion 3"),
-                    "Debe mostrar todas las acciones");
-        }
-
-        @Test
-        @DisplayName("Mostrar historial no modifica el historial original")
-        void testMostrarHistorialNoModifica() {
-            historialServicio.registrarAccion("Primera", "Desc1");
-            historialServicio.registrarAccion("Segunda", "Desc2");
-            historialServicio.registrarAccion("Tercera", "Desc3");
-
-            int accionesAntes = contarAccionesEnPila();
-            historialServicio.mostrarHistorial();
-            int accionesDespues = contarAccionesEnPila();
-
-            System.setOut(standardOut);
-            assertEquals(accionesAntes, accionesDespues,
-                    "El historial debe tener el mismo número de acciones después de mostrar");
-        }
-
-        @Test
-        @DisplayName("Mostrar historial preserva el orden LIFO")
-        void testMostrarHistorialPreservaOrdenLIFO() {
-            historialServicio.registrarAccion("Primero", "Desc1");
-            historialServicio.registrarAccion("Segundo", "Desc2");
-            historialServicio.registrarAccion("Tercero", "Desc3");
-
-            historialServicio.mostrarHistorial();
-
-            String output = capturedOutput.toString();
-            int posSegundo = output.indexOf("Segundo");
-            int posPrimero = output.indexOf("Primero");
-
-            assertTrue(posSegundo < posPrimero,
-                    "Debe mostrar en orden inverso (LIFO): último primero");
-        }
-
-        @Test
-        @DisplayName("Mostrar historial múltiples veces")
-        void testMostrarHistorialMultipleVeces() {
-            historialServicio.registrarAccion("Test", "Descripción");
-
-            historialServicio.mostrarHistorial();
-            int primeraLlamada = contarAccionesEnPila();
-
-            historialServicio.mostrarHistorial();
-            int segundaLlamada = contarAccionesEnPila();
-
-            System.setOut(standardOut);
-            assertEquals(primeraLlamada, segundaLlamada,
-                    "El historial debe ser idéntico en múltiples llamadas");
-            assertEquals(1, primeraLlamada, "Debe mantener la acción después de dos mostrar");
-        }
-
-        @Test
-        @DisplayName("Mostrar historial imprime encabezado")
-        void testEncabezadoHistorial() {
-            historialServicio.mostrarHistorial();
-
-            String output = capturedOutput.toString();
-            assertTrue(output.contains("Historial de acciones:"),
-                    "Debe imprimir el encabezado del historial");
+            assertTrue(posNueva < posVieja, "Al mostrar, la acción más reciente debe aparecer arriba");
         }
     }
 
     @Nested
-    @DisplayName("Pruebas de integración")
+    @DisplayName("Pruebas de Integración")
     class IntegracionTests {
 
         @Test
-        @DisplayName("Flujo completo: registrar, mostrar, deshacer")
+        @DisplayName("Flujo: Registrar -> Mostrar -> Deshacer -> Registrar")
         void testFlujoCompleto() {
-            // Registrar acciones
-            historialServicio.registrarAccion("AgregarAmigo", "Juan agregado");
-            historialServicio.registrarAccion("PublicarEstado", "Estado nuevo");
+            clientePrueba.getHistorial().Apilar("Login");
+            clientePrueba.getHistorial().Apilar("Busqueda");
 
-            // Mostrar historial
-            historialServicio.mostrarHistorial();
+            HistorialServicio.deshacerUltimaAccion(clientePrueba.getHistorial()); // Borra Busqueda
+            clientePrueba.getHistorial().Apilar("Logout");
 
-            // Verificar que hay 2 acciones
-            System.setOut(standardOut);
-            assertEquals(2, contarAccionesEnPila(), "Debe haber 2 acciones después de registrar y mostrar");
-
-            // Deshacer una
-            System.setOut(new PrintStream(capturedOutput));
-            historialServicio.deshacerUltimaAccion();
-            System.setOut(standardOut);
-
-            assertEquals(1, contarAccionesEnPila(), "Debe haber 1 acción después de deshacer");
-        }
-
-        @Test
-        @DisplayName("Alternar entre registro y deshacimiento")
-        void testAlternacionRegistroDeshacimiento() {
-            historialServicio.registrarAccion("Acción 1", "Desc 1");
-            assertEquals(1, contarAccionesEnPila());
-
-            System.setOut(new PrintStream(capturedOutput));
-            historialServicio.deshacerUltimaAccion();
-            System.setOut(standardOut);
-            assertEquals(0, contarAccionesEnPila());
-
-            historialServicio.registrarAccion("Acción 2", "Desc 2");
-            historialServicio.registrarAccion("Acción 3", "Desc 3");
             assertEquals(2, contarAccionesEnPila());
-        }
-
-        @Test
-        @DisplayName("Registrar después de deshacer todo")
-        void testRegistrarDespuesDeshacerTodo() {
-            historialServicio.registrarAccion("Primera", "Desc");
-
-            System.setOut(new PrintStream(capturedOutput));
-            historialServicio.deshacerUltimaAccion();
-            System.setOut(standardOut);
-
-            assertEquals(0, contarAccionesEnPila());
-
-            historialServicio.registrarAccion("Segunda", "Desc");
-            assertEquals(1, contarAccionesEnPila());
-        }
-
-        @Test
-        @DisplayName("Mostrar después de deshacer")
-        void testMostrarDespuesDeshacer() {
-            historialServicio.registrarAccion("A", "D1");
-            historialServicio.registrarAccion("B", "D2");
-
-            System.setOut(new PrintStream(capturedOutput));
-            historialServicio.deshacerUltimaAccion();
-
-            ByteArrayOutputStream outputAntes = capturedOutput;
-            capturedOutput = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(capturedOutput));
-
-            historialServicio.mostrarHistorial();
-            System.setOut(standardOut);
-
-            String output = capturedOutput.toString();
-            assertTrue(output.contains("A") && !output.contains("B"),
-                    "Debe mostrar solo la acción restante");
+            assertEquals("Logout", clientePrueba.getHistorial().Tope());
         }
     }
 }

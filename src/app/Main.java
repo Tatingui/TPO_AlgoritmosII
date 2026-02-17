@@ -2,6 +2,7 @@ package app;
 
 import app.implementaciones.ColaLD;
 import app.interfaces.ColaTDA;
+import app.modelo.Cliente;
 import app.modelo.Solicitud;
 import app.servicio.HistorialServicio;
 import app.servicio.RedSocialManager;
@@ -22,14 +23,8 @@ public class Main {
 
         // Al instanciarse, el manager ya carga el JSON automáticamente (Punto 4)
         RedSocialManager manager = new RedSocialManager();
-        HistorialServicio historial = new HistorialServicio();
-
-        // Estructura para solicitudes pendientes (Punto 3)
-        ColaTDA<Solicitud> pendientes = new ColaLD<>();
-        pendientes.InicializarCola();
 
         // Control de estados para evitar duplicados
-        Set<String> pendientesSet = new HashSet<>();
         Set<String> aceptadasSet = new HashSet<>();
         Set<String> rechazadasSet = new HashSet<>();
 
@@ -51,35 +46,48 @@ public class Main {
             System.out.println("7) Ver próxima solicitud en cola");
             System.out.println("8) Aceptar próxima solicitud");
             System.out.println("9) Rechazar próxima solicitud");
-            System.out.println("0) Salir");
+            System.out.println("0) Guardar cambios y salir");
             System.out.print("Seleccione una opción: ");
 
             String opcion = sc.nextLine().trim();
 
             try {
                 switch (opcion) {
+                    // En Main.java
+
                     case "1" -> {
                         System.out.print("Nombre a buscar: ");
                         String nombre = sc.nextLine().trim();
                         manager.buscarYMostrarCliente(nombre);
-                        historial.registrarAccion("BuscarNombre", "Búsqueda: " + nombre);
                     }
 
                     case "2" -> {
                         System.out.print("Scoring exacto a buscar: ");
                         int scoring = Integer.parseInt(sc.nextLine().trim());
                         manager.buscarYMostrarPorScoring(scoring);
-                        historial.registrarAccion("BuscarScoring", "Scoring: " + scoring);
                     }
-
                     case "3" -> {
                         manager.imprimirRankingCompleto();
-                        historial.registrarAccion("VerRanking", "Consulta de ranking");
+
                     }
 
-                    case "4" -> historial.deshacerUltimaAccion();
+                    case "4" -> { // Deshacer
+                        System.out.print("Nombre del usuario: ");
+                        String nombre = sc.nextLine().trim();
+                        Cliente c = manager.getRepositorio().buscarPorNombre(nombre);
+                        if (c != null) {
+                            HistorialServicio.deshacerUltimaAccion(c.getHistorial());
+                        }
+                    }
 
-                    case "5" -> historial.mostrarHistorial();
+                    case "5" -> { // Mostrar Historial
+                        System.out.print("Nombre del usuario: ");
+                        String nombre = sc.nextLine().trim();
+                        Cliente c = manager.getRepositorio().buscarPorNombre(nombre);
+                        if (c != null) {
+                            HistorialServicio.mostrarHistorialPersonal(c.getHistorial());
+                        }
+                    }
 
                     case "6" -> {
                         System.out.print("Tu nombre (Emisor): ");
@@ -92,44 +100,67 @@ public class Main {
                             break;
                         }
 
-                        SolicitudesServicio.enviarSolicitud(pendientes, seguidor, seguido, manager.getRepositorio());
-                        historial.registrarAccion("EnviarSolicitud", "De " + seguidor + " a " + seguido);
+                        // Invocación directa
+                        SolicitudesServicio.enviarSolicitud(seguidor, seguido, manager.getRepositorio());
                     }
 
                     case "7" -> {
-                        if (pendientes.ColaVacia()) {
-                            System.out.println("No hay solicitudes en la cola.");
-                        } else {
-                            System.out.println("Siguiente en espera: " + pendientes.Primero());
+                        System.out.print("Tu nombre (para ver tus solicitudes): ");
+                        String nombre = sc.nextLine().trim();
+                        Cliente c = manager.getRepositorio().buscarPorNombre(nombre);
+                        if (c != null) {
+                            if (c.getSolicitudes().ColaVacia()) {
+                                System.out.println("No tienes solicitudes en espera.");
+                            } else {
+                                System.out.println("Siguiente en espera para ti: " + c.getSolicitudes().Primero());
+                            }
                         }
                     }
 
                     case "8" -> {
-                        if (pendientes.ColaVacia()) {
-                            System.out.println("Cola vacía.");
+                        System.out.print("Tu nombre (quien acepta la solicitud): ");
+                        String nombreReceptor = sc.nextLine().trim();
+                        Cliente receptor = manager.getRepositorio().buscarPorNombre(nombreReceptor);
+
+                        if (receptor == null || receptor.getSolicitudes().ColaVacia()) {
+                            System.out.println("No hay solicitudes para " + nombreReceptor);
                             break;
                         }
-                        Solicitud s = pendientes.Primero();
 
-                        SolicitudesServicio.procesarSiguiente(pendientes, true);
+                        String nombreEmisor = receptor.getSolicitudes().Primero();
+                        receptor.getSolicitudes().Desacolar();
 
-                        historial.registrarAccion("AceptarSolicitud", "Aceptada: " + s);
+                        Cliente emisor = manager.getRepositorio().buscarPorNombre(nombreEmisor);
+
+                        if (emisor != null) {
+                            emisor.getSiguiendo().add(receptor.getNombre());
+                            emisor.getHistorial().Apilar("Ahora sigues a: " + receptor.getNombre());
+                            receptor.getHistorial().Apilar("Aceptaste la solicitud de: " + emisor.getNombre());
+
+                            System.out.println("[+] " + emisor.getNombre() + " ahora sigue a " + receptor.getNombre());
+                        }
                     }
 
                     case "9" -> {
-                        if (pendientes.ColaVacia()) {
-                            System.out.println("Cola vacía.");
-                            break;
+                        System.out.print("Tu nombre (quien rechaza): ");
+                        String nombre = sc.nextLine().trim();
+                        Cliente receptor = manager.getRepositorio().buscarPorNombre(nombre);
+
+                        if (receptor != null && !receptor.getSolicitudes().ColaVacia()) {
+                            String emisor = receptor.getSolicitudes().Primero();
+                            receptor.getSolicitudes().Desacolar();
+                            receptor.getHistorial().Apilar("Rechazaste solicitud de: " + emisor);
+                            System.out.println("Solicitud de " + emisor + " rechazada.");
+                        } else {
+                            System.out.println("No hay solicitudes para rechazar.");
                         }
-                        Solicitud s = pendientes.Primero();
-
-                        SolicitudesServicio.procesarSiguiente(pendientes, false);
-
-                        historial.registrarAccion("RechazarSolicitud", "Rechazada: " + s);
                     }
 
-                    case "0" -> salir = true;
-                    default -> System.out.println("Opción no válida.");
+                    case "0" -> {
+                        System.out.println("Guardando datos antes de salir...");
+                        manager.guardarDatos("clientes.json");
+                        salir = true;
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("Ocurrió un error: " + e.getMessage());

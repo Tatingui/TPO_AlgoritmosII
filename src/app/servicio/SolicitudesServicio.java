@@ -5,6 +5,7 @@ import app.modelo.Solicitud;
 import app.repositorio.ClienteRepositorio;
 import java.util.HashSet;
 import java.util.Set;
+import app.modelo.Cliente;
 
 public class SolicitudesServicio {
 
@@ -20,30 +21,28 @@ public class SolicitudesServicio {
         return emisor.trim().toLowerCase() + "->" + receptor.trim().toLowerCase();
     }
 
-    public static void enviarSolicitud(ColaTDA<Solicitud> cola, String emisor, String receptor, ClienteRepositorio repo) {
-        // Validación de nulidad para evitar NullPointerException
-        if (emisor == null || receptor == null) {
-            System.out.println("[!] Error: Los nombres no pueden ser nulos.");
+    public static void enviarSolicitud(String emisor, String receptor, ClienteRepositorio repo) {
+        if (emisor == null || receptor == null) return;
+
+        Cliente clienteEmisor = repo.buscarPorNombre(emisor);
+        Cliente clienteReceptor = repo.buscarPorNombre(receptor);
+
+        if (clienteEmisor == null || clienteReceptor == null) {
+            System.out.println("[!] Error: Usuario no encontrado.");
             return;
         }
 
-        String key = generarKey(emisor, receptor);
-
-        if (repo != null) {
-            var clienteEmisor = repo.buscarPorNombre(emisor);
-            if (clienteEmisor != null && clienteEmisor.siguiendo() != null && clienteEmisor.siguiendo().contains(receptor)) {
-                System.out.println("[!] Error: Ya sigues a esta persona.");
-                return;
-            }
+        if (clienteEmisor.getSiguiendo().size() >= 2) {
+            System.out.println("[!] Error: " + emisor + " ya sigue al máximo de 2 personas.");
+            clienteEmisor.getHistorial().Apilar("Intento fallido de seguir a " + receptor + " (Límite 2)");
+            return;
         }
 
-        if (pendientesSet.contains(key)) return;
-        if (aceptadasSet.contains(key)) return;
+        clienteReceptor.getSolicitudes().Acolar(emisor);
 
-        rechazadasSet.remove(key);
-        Solicitud nueva = new Solicitud(emisor, receptor);
-        cola.Acolar(nueva);
-        pendientesSet.add(key);
+        clienteEmisor.getHistorial().Apilar("Envio solicitud a " + receptor);
+
+        System.out.println("[+] Solicitud enviada de " + emisor + " a " + receptor);
     }
 
     public static void procesarSiguiente(ColaTDA<Solicitud> pendientes, boolean aceptar) {
@@ -53,7 +52,6 @@ public class SolicitudesServicio {
 
         Solicitud s = pendientes.Primero();
 
-        // Verificación de nulidad de la solicitud dentro de la cola
         if (s != null) {
             String key = generarKey(s.seguidor(), s.seguido());
             if (aceptar) {
@@ -66,7 +64,7 @@ public class SolicitudesServicio {
             pendientesSet.remove(key);
         }
 
-        // MUY IMPORTANTE: Desacolar DEBE llamarse siempre para que el test pase
         pendientes.Desacolar();
     }
 }
+

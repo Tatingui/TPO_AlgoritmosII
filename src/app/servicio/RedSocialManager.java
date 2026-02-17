@@ -4,6 +4,9 @@ import app.modelo.Cliente;
 import app.modelo.Clientes;
 import app.persistencia.JsonLoader;
 import app.repositorio.ClienteRepositorio;
+import tools.jackson.databind.json.JsonMapper;
+
+import java.io.File;
 
 public class RedSocialManager {
     private final ClienteRepositorio repositorio;
@@ -37,10 +40,17 @@ public class RedSocialManager {
         }
         Clientes clientesNuevos = loader.cargarClientes(ruta);
         if (clientesNuevos != null) {
-            for (Cliente c : clientesNuevos.clientes()) {
+            for (Cliente c : clientesNuevos.getClientes()) {
                 repositorio.guardarCliente(c);
             }
             System.out.println("LOG: Carga de clientes completada.");
+        }
+        if (clientesNuevos != null) {
+            for (Cliente c : clientesNuevos.getClientes()) {
+                // ¡ESTA LÍNEA ES VITAL!
+                c.inicializarEstructurasDesdeJson();
+                repositorio.guardarCliente(c);
+            }
         }
     }
 
@@ -67,5 +77,26 @@ public class RedSocialManager {
 
     public ClienteRepositorio getRepositorio() {
         return this.repositorio; // O clienteRepositorio, según el nombre que le dejaste
+    }
+
+    public void guardarDatos(String ruta) {
+        try {
+            // 1. Sincronizamos: Pasamos datos de los TDAs (Pila/Cola) a las Listas de Java
+            for (Cliente c : repositorio.obtenerTodos()) {
+                c.prepararParaGuardar(); // Usamos este que es el que tenés en Cliente.java
+            }
+
+            // 2. Preparamos el contenedor que Jackson entiende
+            Clientes wrapper = new Clientes();
+            wrapper.setClientes(repositorio.obtenerTodos());
+
+            // 3. Escribimos en el archivo físico
+            JsonMapper mapper = new JsonMapper();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(ruta), wrapper);
+
+            System.out.println("[SISTEMA] Cambios guardados en: " + ruta);
+        } catch (Exception e) {
+            System.err.println("[ERROR] No se pudo guardar el archivo: " + e.getMessage());
+        }
     }
 }
