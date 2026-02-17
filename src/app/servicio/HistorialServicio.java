@@ -1,58 +1,54 @@
-// Maneja la Pila Deque
-
-/*
- * Gestiona el historial de cambios permitiendo la función "Deshacer".
- * Utiliza el concepto de Pila (LIFO).
- */
-
 package app.servicio;
 
+import app.interfaces.PilaTDA;
 import app.implementaciones.PilaLD;
-import app.modelo.Accion;
-
-import java.time.LocalDateTime;
 
 public class HistorialServicio {
-    private final PilaLD<Accion> historial;
 
-    public HistorialServicio() {
-        historial = new PilaLD<>();
-        historial.InicializarPila();
-    }
+    // Ya no necesitamos un atributo "historial" global aquí, 
+    // porque el historial vive dentro de cada Cliente.
 
-    public void registrarAccion(String tipo, String descripcion) {
-        historial.Apilar(new Accion(tipo, descripcion, LocalDateTime.now()));
-    }
-
-    public void deshacerUltimaAccion() {
-        if (!historial.PilaVacia()) {
-            Accion ultimaAccion = historial.Tope();
-            // Lógica para revertir la acción según su tipo
-            // Por ejemplo, si es "AgregarAmigo", eliminar ese amigo
-            // Si es "PublicarEstado", eliminar esa publicación, etc.
-            System.out.println("Deshaciendo acción: " + ultimaAccion);
-            historial.Desapilar();
-        } else {
-            System.out.println("No hay acciones para deshacer.");
+    /**
+     * Muestra el historial de una pila específica (la de un cliente).
+     */
+    public static void mostrarHistorialPersonal(PilaTDA<String> pila) {
+        if (pila == null || pila.PilaVacia()) {
+            System.out.println("[!] El historial está vacío.");
+            return;
         }
-    }
 
-    public void mostrarHistorial() {
-        PilaLD<Accion> tempPila = new PilaLD<>();
+        // Usamos la interfaz PilaTDA para la auxiliar
+        PilaTDA<String> tempPila = new PilaLD<>();
         tempPila.InicializarPila();
 
-        System.out.println("Historial de acciones:");
-        while (!historial.PilaVacia()) {
-            Accion accion = historial.Tope();
-            System.out.println(accion);
+        System.out.println("\n=== HISTORIAL DE ACTIVIDAD ===");
+
+        // Desapilamos para mostrar
+        while (!pila.PilaVacia()) {
+            String accion = pila.Tope();
+            System.out.println(" • " + accion);
             tempPila.Apilar(accion);
-            historial.Desapilar();
+            pila.Desapilar();
         }
 
-        // Restaurar el historial original
+        // Restauramos la pila original para no perder los datos
         while (!tempPila.PilaVacia()) {
-            historial.Apilar(tempPila.Tope());
+            pila.Apilar(tempPila.Tope());
             tempPila.Desapilar();
+        }
+        System.out.println("==============================\n");
+    }
+
+    /**
+     * Lógica para la opción 4 del menú (Deshacer)
+     */
+    public static void deshacerUltimaAccion(PilaTDA<String> pila) {
+        if (pila != null && !pila.PilaVacia()) {
+            String ultima = pila.Tope();
+            System.out.println("[←] Deshaciendo última acción: " + ultima);
+            pila.Desapilar();
+        } else {
+            System.out.println("[!] No hay acciones para deshacer.");
         }
     }
 }
