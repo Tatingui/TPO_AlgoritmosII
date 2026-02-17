@@ -60,7 +60,7 @@ public class RedSocialManager {
         }
         Cliente c = repositorio.buscarPorNombre(nombre);
         if (c != null) {
-            System.out.println("Encontrado por Nombre: " + c);
+            System.out.println("Encontrado por Nombre: " + c.getNombre());
         } else {
             System.out.println("El cliente '" + nombre + "' no existe.");
         }
