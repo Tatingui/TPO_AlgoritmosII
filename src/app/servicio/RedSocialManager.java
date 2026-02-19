@@ -30,7 +30,7 @@ public class RedSocialManager {
 
     private void inicializarDatos() {
         try {
-            this.cargarDesdeArchivo("clientes.json");
+            this.cargarDesdeArchivo("Clientes.json");
             System.out.println("[SISTEMA] Datos cargados automáticamente.");
         } catch (Exception e) {
             System.err.println("[ERROR] No se pudo cargar automáticamente.");
