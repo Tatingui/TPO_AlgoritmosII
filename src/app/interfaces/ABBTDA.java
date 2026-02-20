@@ -1,15 +1,15 @@
 package app.interfaces;
 
-public interface ABBTDA {
+public interface ABBTDA<T extends Comparable<T>> {
 
     // siempre que el árbol esté inicializado y no esté vacío
-    int Raiz();
+    T Raiz();
 
     // siempre que el árbol esté inicializado y no esté vacío
-    ABBTDA HijoIzq();
+    ABBTDA<T> HijoIzq();
 
     // siempre que el árbol esté inicializado y no esté vacío
-    ABBTDA HijoDer();
+    ABBTDA<T> HijoDer();
 
     // siempre que el árbol esté inicializado
     boolean ArbolVacio();
@@ -17,8 +17,8 @@ public interface ABBTDA {
     void InicializarArbol();
 
     // siempre que el árbol esté inicializado
-    void AgregarElem(int x);
+    void AgregarElem(T x);
 
     // siempre que el árbol esté inicializado
-    void EliminarElem(int x);
+    void EliminarElem(T x);
 }

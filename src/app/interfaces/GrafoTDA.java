@@ -1,26 +1,26 @@
 package app.interfaces;
 
-public interface GrafoTDA {
+public interface GrafoTDA<T> {
     void InicializarGrafo();
 
     // siempre que el grafo esté inicializado y no exista el nodo
-    void AgregarVertice(int v);
+    void AgregarVertice(T v);
 
     // siempre que el grafo esté inicializado y exista el nodo
-    void EliminarVertice(int v);
+    void EliminarVertice(T v);
 
     // siempre que el grafo esté inicializado
-    ConjuntoTDA Vertices();
+    ConjuntoTDA<T> Vertices();
 
     // siempre que el grafo esté inicializado ,no exista la arista ,pero existan ambos nodos
-    void AgregarArista(int v1, int v2, int peso);
+    void AgregarArista(T v1, T v2, int peso);
 
     // siempre que el grafo esté inicializado y exista la arista
-    void EliminarArista(int v1, int v2);
+    void EliminarArista(T v1, T v2);
 
     // siempre que el grafo esté inicializado y existan los nodos
-    boolean ExisteArista(int v1, int v2);
+    boolean ExisteArista(T v1, T v2);
 
     // siempre que el grafo esté inicializado y exista la arista
-    int PesoArista(int v1, int v2);
+    int PesoArista(T v1, T v2);
 }
