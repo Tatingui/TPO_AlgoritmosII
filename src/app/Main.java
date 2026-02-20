@@ -133,11 +133,32 @@ public class Main {
                         Cliente emisor = manager.getRepositorio().buscarPorNombre(nombreEmisor);
 
                         if (emisor != null) {
-                            emisor.getSiguiendo().add(receptor.getNombre());
-                            emisor.getHistorial().Apilar("Ahora sigues a: " + receptor.getNombre());
-                            receptor.getHistorial().Apilar("Aceptaste la solicitud de: " + emisor.getNombre());
+                            try {
+                                // Agregar conexión bidireccional al grafo (máximo 3 vértices)
+                                emisor.agregarConexion(receptor.getNombre(), 1);
+                                receptor.agregarConexion(emisor.getNombre(), 1);
 
-                            System.out.println("[+] " + emisor.getNombre() + " ahora sigue a " + receptor.getNombre());
+                                // Actualizar lista de siguiendo
+                                emisor.getSiguiendo().add(receptor.getNombre());
+
+                                // Registrar en histórico
+                                emisor.getHistorial().Apilar("Ahora sigues a: " + receptor.getNombre());
+                                receptor.getHistorial().Apilar("Aceptaste la solicitud de: " + emisor.getNombre());
+
+                                System.out.println("[+] " + emisor.getNombre() + " ahora sigue a " + receptor.getNombre());
+                                System.out.println("[+] Conexión agregada al grafo de relaciones");
+
+                            } catch (IllegalStateException e) {
+                                // Si falla por límite de vértices, aún registrar en siguiendo
+                                System.out.println("⚠ Advertencia: " + e.getMessage());
+                                System.out.println("  Seguimiento registrado pero grafo en límite de 3 vértices");
+
+                                emisor.getSiguiendo().add(receptor.getNombre());
+                                emisor.getHistorial().Apilar("Ahora sigues a: " + receptor.getNombre());
+                                receptor.getHistorial().Apilar("Aceptaste la solicitud de: " + emisor.getNombre());
+
+                                System.out.println("[+] " + emisor.getNombre() + " ahora sigue a " + receptor.getNombre());
+                            }
                         }
                     }
 
