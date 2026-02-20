@@ -1,7 +1,7 @@
 package app.implementaciones;
 
-class NodoArista {
+class NodoArista<T> {
     int etiqueta;
-    NodoGrafo nodoDestino;
-    NodoArista sigArista;
+    NodoGrafo<T> nodoDestino;
+    NodoArista<T> sigArista;
 }

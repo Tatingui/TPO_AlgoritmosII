@@ -2,11 +2,11 @@ package app.implementaciones;
 
 import app.interfaces.ABBTDA;
 
-public class ABB implements ABBTDA {
+public class ABB<T extends Comparable<T>> implements ABBTDA<T> {
 
-    NodoABB raiz;
+    NodoABB<T> raiz;
 
-    public int Raiz() {
+    public T Raiz() {
         return raiz.info;
     }
 
@@ -18,41 +18,40 @@ public class ABB implements ABBTDA {
         raiz = null;
     }
 
-    public ABBTDA HijoDer() {
+    public ABBTDA<T> HijoDer() {
         return raiz.hijoDer;
     }
 
-    public ABBTDA HijoIzq() {
+    public ABBTDA<T> HijoIzq() {
         return raiz.hijoIzq;
     }
 
-    public void AgregarElem(int x) {
+    public void AgregarElem(T x) {
         if (raiz == null) {
-            raiz = new NodoABB();
+            raiz = new NodoABB<>();
             raiz.info = x;
-            raiz.hijoIzq = new ABB();
+            raiz.hijoIzq = new ABB<>();
             raiz.hijoIzq.InicializarArbol();
-            raiz.hijoDer = new ABB();
+            raiz.hijoDer = new ABB<>();
             raiz.hijoDer.InicializarArbol();
-        } else if (raiz.info > x)
+        } else if (raiz.info.compareTo(x) > 0)
             raiz.hijoIzq.AgregarElem(x);
-        else if (raiz.info < x)
+        else if (raiz.info.compareTo(x) < 0)
             raiz.hijoDer.AgregarElem(x);
     }
 
-    public void EliminarElem(int x) {
+    public void EliminarElem(T x) {
         if (raiz != null) {
-            if (raiz.info == x && raiz.hijoIzq.ArbolVacio() &&
+            if (raiz.info.compareTo(x) == 0 && raiz.hijoIzq.ArbolVacio() &&
                     raiz.hijoDer.ArbolVacio()) {
                 raiz = null;
-            } else if (raiz.info == x && !raiz.hijoIzq.ArbolVacio()
-            ) {
+            } else if (raiz.info.compareTo(x) == 0 && !raiz.hijoIzq.ArbolVacio()) {
                 raiz.info = this.mayor(raiz.hijoIzq);
                 raiz.hijoIzq.EliminarElem(raiz.info);
-            } else if (raiz.info == x && raiz.hijoIzq.ArbolVacio()) {
+            } else if (raiz.info.compareTo(x) == 0 && raiz.hijoIzq.ArbolVacio()) {
                 raiz.info = this.menor(raiz.hijoDer);
                 raiz.hijoDer.EliminarElem(raiz.info);
-            } else if (raiz.info < x) {
+            } else if (raiz.info.compareTo(x) < 0) {
                 raiz.hijoDer.EliminarElem(x);
             } else {
                 raiz.hijoIzq.EliminarElem(x);
@@ -60,7 +59,7 @@ public class ABB implements ABBTDA {
         }
     }
 
-    private int mayor(ABBTDA a) {
+    private T mayor(ABBTDA<T> a) {
         if (a.HijoDer().ArbolVacio()) {
             return a.Raiz();
         } else {
@@ -68,7 +67,7 @@ public class ABB implements ABBTDA {
         }
     }
 
-    private int menor(ABBTDA a) {
+    private T menor(ABBTDA<T> a) {
         if (a.HijoIzq().ArbolVacio()) {
             return a.Raiz();
         } else {
@@ -76,7 +75,7 @@ public class ABB implements ABBTDA {
         }
     }
 
-    public void recorridoPreOrder(ABBTDA a) {
+    public void recorridoPreOrder(ABBTDA<T> a) {
         if (!a.ArbolVacio()) {
             System.out.println(a.Raiz());
             recorridoPreOrder(a.HijoIzq());
@@ -84,7 +83,7 @@ public class ABB implements ABBTDA {
         }
     }
 
-    public void recorridoInOrder(ABBTDA a) {
+    public void recorridoInOrder(ABBTDA<T> a) {
         if (!a.ArbolVacio()) {
             recorridoInOrder(a.HijoIzq());
             System.out.println(a.Raiz());
@@ -92,7 +91,7 @@ public class ABB implements ABBTDA {
         }
     }
 
-    public void recorridoPostOrder(ABBTDA a) {
+    public void recorridoPostOrder(ABBTDA<T> a) {
         if (!a.ArbolVacio()) {
             recorridoPostOrder(a.HijoIzq());
             recorridoPostOrder(a.HijoDer());
