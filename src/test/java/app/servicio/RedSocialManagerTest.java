@@ -33,10 +33,11 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Cargar clientes desde archivo JSON válido")
         void testCargarArchivoValido() {
-            capturedOutput.reset(); // Limpiamos lo que puso el constructor
+            capturedOutput.reset();
             redSocialManager.cargarDesdeArchivo("clientes.json");
             String output = capturedOutput.toString();
-            assertTrue(output.contains("LOG: Carga de clientes completada"), "Debe encontrar el mensaje de confirmación");
+            assertTrue(output.contains("LOG: Carga de clientes completada"),
+                    "El log debería confirmar la carga exitosa en los ABB");
         }
 
         @Test
@@ -53,7 +54,6 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Cargar archivo con ruta nula")
         void testCargarArchivoRutaNula() {
-            // Tu código lanza IllegalArgumentException explícitamente
             assertThrows(IllegalArgumentException.class, () -> redSocialManager.cargarDesdeArchivo(null));
         }
 
@@ -67,27 +67,29 @@ class RedSocialManagerTest {
         @Test
         @DisplayName("Mensaje de carga de clientes completada se imprime")
         void testMensajeCargaCompletada() {
-            redSocialManager.cargarDesdeArchivo("clientes_test.json");
+            capturedOutput.reset();
+            redSocialManager.cargarDesdeArchivo("clientes.json");
 
             String output = capturedOutput.toString();
             assertTrue(output.contains("LOG: Carga de clientes completada"),
-                    "El mensaje debe indicar que la carga se completó");
+                    "El sistema debe loguear la finalización del proceso");
         }
 
         @Test
         @DisplayName("Cargar múltiples archivos consecutivamente")
         void testCargarMultiplesArchivos() {
-            redSocialManager.cargarDesdeArchivo("clientes_test.json");
+            redSocialManager.cargarDesdeArchivo("clientes.json");
+            capturedOutput.reset();
 
-            ByteArrayOutputStream firstOutput = capturedOutput;
-            capturedOutput = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(capturedOutput));
-
-            redSocialManager.cargarDesdeArchivo("clientes_test.json");
+            redSocialManager.cargarDesdeArchivo("clientes.json");
 
             String output = capturedOutput.toString();
             assertTrue(output.contains("LOG: Carga de clientes completada"),
-                    "Debe poder cargar múltiples veces");
+                    "El ABB debe permitir re-cargar datos sin romperse");
+
+            // Verificación extra: que el ABB no esté vacío
+            assertNotNull(redSocialManager.getRepositorio().buscarPorNombre("Alice"),
+                    "Alice debería seguir existiendo tras múltiples cargas");
         }
     }
 

@@ -35,22 +35,15 @@ public class RedSocialManager {
     }
 
     public void cargarDesdeArchivo(String ruta) {
-        if (ruta == null) {
-            throw new IllegalArgumentException("La ruta para cargar JSON no existe");
-        }
-        Clientes clientesNuevos = loader.cargarClientes(ruta);
-        if (clientesNuevos != null) {
-            for (Cliente c : clientesNuevos.getClientes()) {
+        if (ruta == null) throw new IllegalArgumentException("Ruta nula");
+        Clientes wrapper = loader.cargarClientes(ruta);
+
+        if (wrapper != null && wrapper.getClientes() != null) {
+            for (Cliente c : wrapper.getClientes()) {
                 repositorio.guardarCliente(c);
             }
-            System.out.println("LOG: Carga de clientes completada.");
-        }
-        if (clientesNuevos != null) {
-            for (Cliente c : clientesNuevos.getClientes()) {
-                // ¡ESTA LÍNEA ES VITAL!
-                c.inicializarEstructurasDesdeJson();
-                repositorio.guardarCliente(c);
-            }
+            System.out.println("LOG: Carga de clientes completada");
+            System.out.println("[LOG] Carga exitosa: " + wrapper.getClientes().size() + " clientes insertados en el ABB.");
         }
     }
 

@@ -30,7 +30,6 @@ class ClienteRepositorioTest {
         Cliente recuperado = repositorio.buscarPorNombre("Messi");
 
         assertNotNull(recuperado, "El cliente debería existir en el diccionario");
-        // CAMBIO: scoring() -> getScoring()
         assertEquals(99, recuperado.getScoring(), "El scoring debe coincidir");
     }
 
