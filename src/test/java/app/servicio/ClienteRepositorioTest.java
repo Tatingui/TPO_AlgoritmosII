@@ -111,4 +111,32 @@ class ClienteRepositorioTest {
 
         assertFalse(output.contains("Solo"), "No debería mostrar al cliente de 10 puntos");
     }
+
+    @Test
+    @DisplayName("Obtener todos los clientes en orden descendente por scoring")
+    void testObtenerTodosOrdenado() {
+        repositorio.guardarCliente(new Cliente("Messi", 99, new ArrayList<>(), new ArrayList<>()));
+        repositorio.guardarCliente(new Cliente("Maradona", 95, new ArrayList<>(), new ArrayList<>()));
+        repositorio.guardarCliente(new Cliente("Pele", 97, new ArrayList<>(), new ArrayList<>()));
+
+        var clientes = repositorio.obtenerTodos();
+
+        assertEquals(3, clientes.size(), "Debe tener 3 clientes");
+        assertEquals(99, clientes.get(0).getScoring(), "Primer cliente debe tener scoring 99");
+        assertEquals(97, clientes.get(1).getScoring(), "Segundo cliente debe tener scoring 97");
+        assertEquals(95, clientes.get(2).getScoring(), "Tercer cliente debe tener scoring 95");
+    }
+
+    @Test
+    @DisplayName("Búsqueda rápida por nombre O(log n)")
+    void testBusquedaPorNombreEficiente() {
+        // Agregar múltiples clientes para verificar que la búsqueda funciona con el árbol de nombres
+        for (int i = 0; i < 100; i++) {
+            repositorio.guardarCliente(new Cliente("Cliente" + i, i, new ArrayList<>(), new ArrayList<>()));
+        }
+
+        Cliente encontrado = repositorio.buscarPorNombre("Cliente50");
+        assertNotNull(encontrado, "Debe encontrar Cliente50");
+        assertEquals(50, encontrado.getScoring(), "Cliente50 debe tener scoring 50");
+    }
 }

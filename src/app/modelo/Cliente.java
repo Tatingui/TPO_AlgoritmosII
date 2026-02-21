@@ -5,16 +5,19 @@ import app.interfaces.PilaTDA;
 import app.implementaciones.ColaLD;
 import app.implementaciones.PilaLD;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.List;
 import java.util.ArrayList;
 
-public class Cliente {
+public class Cliente implements Comparable<Cliente> {
     private String nombre;
-    private int scoring;
+    private Integer scoring;
     private List<String> siguiendo = new ArrayList<>();
     private List<String> conexiones = new ArrayList<>();
-    private List<String> solicitudes_pendientes = new ArrayList<>();
-    private List<String> historial_personal = new ArrayList<>();
+    private List<String> solicitudesPendientes = new ArrayList<>();
+    private List<String> historialPersonal = new ArrayList<>();
 
     @JsonIgnore
     private ColaTDA<String> solicitudes;
@@ -43,29 +46,29 @@ public class Cliente {
     public void inicializarEstructurasDesdeJson() {
         if (solicitudes == null) inicializarTDAs();
 
-        if (solicitudes_pendientes != null) {
-            for (String s : solicitudes_pendientes) {
+        if (solicitudesPendientes != null) {
+            for (String s : solicitudesPendientes) {
                 this.solicitudes.Acolar(s);
             }
         }
-        if (historial_personal != null) {
+        if (historialPersonal != null) {
             // Se apila en orden inverso para que el Tope sea el último del JSON
-            for (int i = historial_personal.size() - 1; i >= 0; i--) {
-                this.historial.Apilar(historial_personal.get(i));
+            for (int i = historialPersonal.size() - 1; i >= 0; i--) {
+                this.historial.Apilar(historialPersonal.get(i));
             }
         }
     }
 
     public void prepararParaGuardar() {
-        this.solicitudes_pendientes.clear();
-        this.historial_personal.clear();
+        this.solicitudesPendientes.clear();
+        this.historialPersonal.clear();
 
         // Volcar Cola de solicitudes
         ColaTDA<String> tempCola = new ColaLD();
         tempCola.InicializarCola();
         while (!this.solicitudes.ColaVacia()) {
             String s = this.solicitudes.Primero();
-            this.solicitudes_pendientes.add(s);
+            this.solicitudesPendientes.add(s);
             tempCola.Acolar(s);
             this.solicitudes.Desacolar();
         }
@@ -76,7 +79,7 @@ public class Cliente {
         tempPila.InicializarPila();
         while (!this.historial.PilaVacia()) {
             String h = this.historial.Tope();
-            this.historial_personal.add(0, h); // Insertar al inicio para mantener orden
+            this.historialPersonal.add(0, h); // Insertar al inicio para mantener orden
             tempPila.Apilar(h);
             this.historial.Desapilar();
         }
@@ -86,15 +89,37 @@ public class Cliente {
     // Getters y Setters limpios
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
-    public int getScoring() { return scoring; }
-    public void setScoring(int scoring) { this.scoring = scoring; }
+    public Integer getScoring() { return scoring; }
+    public void setScoring(Integer scoring) { this.scoring = scoring; }
     public List<String> getSiguiendo() { return siguiendo; }
     public List<String> getConexiones() { return conexiones; }
-    public List<String> getSolicitudes_pendientes() { return solicitudes_pendientes; }
-    public List<String> getHistorial_personal() { return historial_personal; }
+    public List<String> getSolicitudesPendientes() { return solicitudesPendientes; }
+    public List<String> getHistorialPersonal() { return historialPersonal; }
 
     @JsonIgnore
     public ColaTDA<String> getSolicitudes() { return solicitudes; }
     @JsonIgnore
     public PilaTDA<String> getHistorial() { return historial; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Cliente cliente)) return false;
+
+        return new EqualsBuilder().append(getNombre(), cliente.getNombre()).append(getScoring(), cliente.getScoring()).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(getNombre()).append(getScoring()).toHashCode();
+    }
+
+
+    @Override
+    public int compareTo(Cliente o) {
+        // Orden descendente: clientes con mayor scoring son "menores"
+        // para que el ABB InOrder los muestre de mayor a menor
+        return o.scoring.compareTo(this.scoring);
+    }
 }

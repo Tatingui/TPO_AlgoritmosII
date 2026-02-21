@@ -1,6 +1,8 @@
 package app.implementaciones;
 
 import app.interfaces.ABBTDA;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ABB<T extends Comparable<T>> implements ABBTDA<T> {
 
@@ -96,6 +98,37 @@ public class ABB<T extends Comparable<T>> implements ABBTDA<T> {
             recorridoPostOrder(a.HijoIzq());
             recorridoPostOrder(a.HijoDer());
             System.out.println(a.Raiz());
+        }
+    }
+
+    // Búsqueda binaria O(log n)
+    public T buscar(T x) {
+        if (raiz == null) {
+            return null;
+        }
+
+        int comparacion = raiz.info.compareTo(x);
+        if (comparacion == 0) {
+            return raiz.info;
+        } else if (comparacion > 0) {
+            return raiz.hijoIzq.buscar(x);
+        } else {
+            return raiz.hijoDer.buscar(x);
+        }
+    }
+
+    // Recorrido InOrder que recolecta elementos en una lista
+    public List<T> recorridoInOrderLista() {
+        List<T> lista = new ArrayList<>();
+        recorridoInOrderListaAux(lista);
+        return lista;
+    }
+
+    private void recorridoInOrderListaAux(List<T> lista) {
+        if (raiz != null) {
+            raiz.hijoIzq.recorridoInOrderListaAux(lista);
+            lista.add(raiz.info);
+            raiz.hijoDer.recorridoInOrderListaAux(lista);
         }
     }
 }

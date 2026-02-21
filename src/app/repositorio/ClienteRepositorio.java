@@ -1,107 +1,93 @@
 package app.repositorio;
 
-import app.interfaces.ConjuntoTDA;
 import app.modelo.Cliente;
-import app.interfaces.DiccionarioSimpleTDA;
-import app.interfaces.ColaPrioridadTDA;
-import app.implementaciones.DiccionarioSimpleLD;
-import app.implementaciones.ColaPrioridadLD;
+import app.implementaciones.ABB;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteRepositorio {
-    // Reemplazamos HashMap por DiccionarioSimpleTDA
-    private final DiccionarioSimpleTDA<String, Cliente> mapaNombres;
+    // ABB de clientes ordenados por scoring (descendente) para ranking eficiente
+    private final ABB<Cliente> arbolClientes;
 
-    // Reemplazamos TreeMap por ColaPrioridadTDA
-    private final ColaPrioridadTDA<Cliente> rankingScoring;
+    // ABB de nombres para búsqueda O(log n)
+    private final ABB<ClienteNodo> arbolNombres;
 
     public ClienteRepositorio() {
-        mapaNombres = new DiccionarioSimpleLD<>();
-        mapaNombres.InicializarDiccionario();
+        arbolClientes = new ABB<>();
+        arbolClientes.InicializarArbol();
 
-        rankingScoring = new ColaPrioridadLD<>();
-        rankingScoring.InicializarCola();
+        arbolNombres = new ABB<>();
+        arbolNombres.InicializarArbol();
     }
 
     public void guardarCliente(Cliente cliente) {
-        // O(n) porque es LD, pero cumple con el TDA
-        mapaNombres.Agregar(cliente.getNombre(), cliente);
+        // Verificar si el cliente ya existe
+        Cliente existente = buscarPorNombre(cliente.getNombre());
 
-        // La cola de prioridad mantiene el orden de scoring automáticamente
-        rankingScoring.AcolarPrioridad(cliente, cliente.getScoring());
+        if (existente != null) {
+            // Eliminar el cliente anterior
+            arbolClientes.EliminarElem(existente);
+            arbolNombres.EliminarElem(new ClienteNodo(existente.getNombre(), existente));
+        }
+
+        // Agregar el nuevo cliente
+        arbolClientes.AgregarElem(cliente);
+        arbolNombres.AgregarElem(new ClienteNodo(cliente.getNombre(), cliente));
     }
 
     public Cliente buscarPorNombre(String nombre) {
-        return mapaNombres.Recuperar(nombre);
+        // Búsqueda O(log n) en el árbol de nombres
+        ClienteNodo nodo = arbolNombres.buscar(new ClienteNodo(nombre, null));
+        return nodo != null ? nodo.cliente : null;
     }
 
     public void mostrarRanking() {
-        System.out.println("--- RANKING DE CLIENTES (Usando Cola de Prioridad) ---");
-        // Clonamos para no destruir la original al mostrar
-        ColaPrioridadTDA<Cliente> aux = new ColaPrioridadLD<>();
-        aux.InicializarCola();
+        System.out.println("--- RANKING DE CLIENTES (Usando ABB ordenado por Scoring) ---");
+        List<Cliente> clientes = arbolClientes.recorridoInOrderLista();
 
-        while (!rankingScoring.ColaVacia()) {
-            Cliente c = rankingScoring.Primero();
-            System.out.println("Puntaje " + rankingScoring.Prioridad() + ": " + c.getNombre());
-
-            aux.AcolarPrioridad(c, rankingScoring.Prioridad());
-            rankingScoring.Desacolar();
-        }
-        // Restaurar
-        reponerCola(aux);
-    }
-
-    private void reponerCola(ColaPrioridadTDA<Cliente> aux) {
-        while (!aux.ColaVacia()) {
-            rankingScoring.AcolarPrioridad(aux.Primero(), aux.Prioridad());
-            aux.Desacolar();
+        for (Cliente c : clientes) {
+            System.out.println("Puntaje " + c.getScoring() + ": " + c.getNombre());
         }
     }
 
     public void buscarPorScoring(int scoringBuscado) {
-        ColaPrioridadTDA<Cliente> aux = new ColaPrioridadLD<>();
-        aux.InicializarCola();
+        List<Cliente> clientes = arbolClientes.recorridoInOrderLista();
         boolean huboResultados = false;
 
-        while (!rankingScoring.ColaVacia()) {
-            Cliente c = rankingScoring.Primero();
-            int prioridadActual = rankingScoring.Prioridad();
-
-            if (prioridadActual == scoringBuscado) {
+        for (Cliente c : clientes) {
+            if (c.getScoring() == scoringBuscado) {
                 System.out.println("-> " + c.getNombre());
                 huboResultados = true;
             }
-
-            aux.AcolarPrioridad(c, prioridadActual);
-            rankingScoring.Desacolar();
         }
-        // Restaurar la cola original
-        reponerCola(aux);
 
-        if (!huboResultados) System.out.println("No se encontraron clientes con ese puntaje.");
+        if (!huboResultados) {
+            System.out.println("No se encontraron clientes con ese puntaje.");
+        }
     }
 
     public List<Cliente> obtenerTodos() {
-        List<Cliente> lista = new ArrayList<>();
+        return arbolClientes.recorridoInOrderLista();
+    }
 
-        // AGREGAMOS EL <String> AQUÍ:
-        ConjuntoTDA<String> llaves = mapaNombres.Claves();
+    /**
+     * Clase auxiliar para envolver Cliente con comparación por nombre
+     * Permite búsqueda O(log n) en el árbol de nombres
+     */
+    private static class ClienteNodo implements Comparable<ClienteNodo> {
+        String nombre;
+        Cliente cliente;
 
-        while (!llaves.ConjuntoVacio()) {
-            // Ahora Java sabe que Elegir() devuelve un String
-            String nombre = llaves.Elegir();
-
-            Cliente c = mapaNombres.Recuperar(nombre);
-            if (c != null) {
-                lista.add(c);
-            }
-
-            llaves.Sacar(nombre);
+        ClienteNodo(String nombre, Cliente cliente) {
+            this.nombre = nombre;
+            this.cliente = cliente;
         }
-        return lista;
+
+        @Override
+        public int compareTo(ClienteNodo o) {
+            return this.nombre.compareTo(o.nombre);
+        }
     }
 
 }
