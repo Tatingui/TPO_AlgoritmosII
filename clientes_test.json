@@ -3,32 +3,55 @@
     {
       "nombre": "Juan",
       "scoring": 100,
-      "siguiendo": ["Carlos", "Maria"],
-      "conexiones": ["Pedro", "Ana"]
+      "siguiendo": [
+        "Carlos",
+        "Maria"
+      ],
+      "conexiones": [
+        "Pedro",
+        "Ana"
+      ]
     },
     {
       "nombre": "Maria",
       "scoring": 85,
-      "siguiendo": ["Juan"],
-      "conexiones": ["Carlos"]
+      "siguiendo": [
+        "Juan"
+      ],
+      "conexiones": [
+        "Carlos"
+      ]
     },
     {
       "nombre": "Carlos",
       "scoring": 120,
-      "siguiendo": ["Juan", "Maria"],
-      "conexiones": ["Pedro", "Ana", "Luis"]
+      "siguiendo": [
+        "Juan",
+        "Maria"
+      ],
+      "conexiones": [
+        "Pedro",
+        "Ana",
+        "Luis"
+      ]
     },
     {
       "nombre": "Pedro",
       "scoring": 75,
       "siguiendo": [],
-      "conexiones": ["Juan"]
+      "conexiones": [
+        "Juan"
+      ]
     },
     {
       "nombre": "Ana",
       "scoring": 95,
-      "siguiendo": ["Maria"],
-      "conexiones": ["Carlos"]
+      "siguiendo": [
+        "Maria"
+      ],
+      "conexiones": [
+        "Carlos"
+      ]
     }
   ]
 }

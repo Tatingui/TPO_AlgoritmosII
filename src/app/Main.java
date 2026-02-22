@@ -1,9 +1,6 @@
 package app;
 
-import app.implementaciones.ColaLD;
-import app.interfaces.ColaTDA;
 import app.modelo.Cliente;
-import app.modelo.Solicitud;
 import app.servicio.HistorialServicio;
 import app.servicio.RedSocialManager;
 import app.servicio.SolicitudesServicio;
@@ -136,7 +133,7 @@ public class Main {
                         Cliente emisor = manager.getRepositorio().buscarPorNombre(nombreEmisor);
 
                         if (emisor != null) {
-                            emisor.getSiguiendo().add(receptor.getNombre());
+                            emisor.agregarSeguidor(receptor.getNombre());
                             emisor.getHistorial().Apilar("Ahora sigues a: " + receptor.getNombre());
                             receptor.getHistorial().Apilar("Aceptaste la solicitud de: " + emisor.getNombre());
 
