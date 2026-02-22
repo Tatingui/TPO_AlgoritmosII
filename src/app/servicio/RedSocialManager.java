@@ -1,13 +1,12 @@
 package app.servicio;
 
+import app.implementaciones.ABB;
+import app.interfaces.ABBTDA;
 import app.modelo.Cliente;
 import app.modelo.Clientes;
 import app.persistencia.JsonLoader;
 import app.repositorio.ClienteRepositorio;
 import tools.jackson.databind.json.JsonMapper;
-import app.implementaciones.ABB;
-import app.interfaces.ABBTDA;
-import app.modelo.Cliente;
 
 import java.io.File;
 
@@ -134,6 +133,7 @@ public class RedSocialManager {
             }
         }
     }
+
     public void mostrarCuartoNivelABBDeConexiones(String nombreCliente) {
         if (nombreCliente == null || nombreCliente.isBlank()) {
             System.out.println("Nombre inválido.");
@@ -171,6 +171,7 @@ public class RedSocialManager {
             System.out.println("(No hay nodos en el cuarto nivel)");
         }
     }
+
     private boolean imprimirNivelABB(ABBTDA<Cliente> arbol, int nivelObjetivo) {
         return imprimirNivelABBRec(arbol, 0, nivelObjetivo);
     }

@@ -1,14 +1,17 @@
 package app.modelo;
 
-import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.List;
+
 import static org.apache.commons.lang3.builder.ToStringStyle.JSON_STYLE;
 
 public class Clientes {
     private List<Cliente> clientes;
 
     // Constructor vacío para Jackson
-    public Clientes() {}
+    public Clientes() {
+    }
 
     public List<Cliente> getClientes() {
         return clientes;

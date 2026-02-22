@@ -1,15 +1,16 @@
 package app.servicio;
 
-import java.util.ArrayList;
 import app.modelo.Cliente;
 import app.repositorio.ClienteRepositorio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Pruebas del Repositorio de Clientes (TADs)")
 class ClienteRepositorioTest {

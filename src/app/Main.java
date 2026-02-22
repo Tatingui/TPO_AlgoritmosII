@@ -1,9 +1,6 @@
 package app;
 
-import app.implementaciones.ColaLD;
-import app.interfaces.ColaTDA;
 import app.modelo.Cliente;
-import app.modelo.Solicitud;
 import app.servicio.HistorialServicio;
 import app.servicio.RedSocialManager;
 import app.servicio.SolicitudesServicio;

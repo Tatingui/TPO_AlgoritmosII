@@ -1,17 +1,17 @@
 package app.modelo;
 
-import app.interfaces.ColaTDA;
-import app.interfaces.PilaTDA;
-import app.interfaces.GrafoTDA;
 import app.implementaciones.ColaLD;
-import app.implementaciones.PilaLD;
 import app.implementaciones.GrafoLA;
+import app.implementaciones.PilaLD;
+import app.interfaces.ColaTDA;
+import app.interfaces.GrafoTDA;
+import app.interfaces.PilaTDA;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cliente implements Comparable<Cliente> {
     private String nombre;
@@ -78,17 +78,25 @@ public class Cliente implements Comparable<Cliente> {
     }
 
     /**
-     * Convierte un grafo a lista de vértices
+     * Convierte un grafo a lista de vértices sin destruir el conjunto interno del grafo
      */
     private List<String> grafoALista(GrafoTDA<String> grafo) {
         List<String> lista = new ArrayList<>();
         if (grafo != null) {
             var vertices = grafo.Vertices();
-            // Recorrer el conjunto de vértices del grafo
+            List<String> temp = new ArrayList<>();
+
+            // Extraer todos los vértices a una lista temporal
             while (!vertices.ConjuntoVacio()) {
                 String v = vertices.Elegir();
-                lista.add(v);
+                temp.add(v);
                 vertices.Sacar(v);
+            }
+
+            // Reconstruir el conjunto y agregar a la lista resultado
+            for (String v : temp) {
+                vertices.Agregar(v);
+                lista.add(v);
             }
         }
         return lista;
@@ -157,21 +165,12 @@ public class Cliente implements Comparable<Cliente> {
     public void agregarSeguidor(String nombre) {
         if (nombre == null || nombre.isBlank()) return;
 
-        // Si el vértice no existe, agregarlo
+        // Agregar solo el vértice del seguidor, sin auto-referencias
         if (!grafoSiguiendo.Vertices().Pertenece(nombre)) {
             grafoSiguiendo.AgregarVertice(nombre);
         }
-
-        // Agregar vértice del cliente actual si no existe
-        if (!grafoSiguiendo.Vertices().Pertenece(this.nombre)) {
-            grafoSiguiendo.AgregarVertice(this.nombre);
-        }
-
-        // Agregar arista si no existe
-        if (!grafoSiguiendo.ExisteArista(this.nombre, nombre)) {
-            grafoSiguiendo.AgregarArista(this.nombre, nombre, 1);
-        }
     }
+
 
     /**
      * Agrega una conexión al grafo de conexiones (bidireccional)
@@ -198,20 +197,35 @@ public class Cliente implements Comparable<Cliente> {
 
     // ==================== GETTERS ====================
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public Integer getScoring() { return scoring; }
-    public void setScoring(Integer scoring) { this.scoring = scoring; }
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Integer getScoring() {
+        return scoring;
+    }
+
+    public void setScoring(Integer scoring) {
+        this.scoring = scoring;
+    }
 
     /**
      * Retorna lista de siguiendo (para compatibilidad con código existente y JSON)
      */
-    public List<String> getSiguiendo() { return siguiendo; }
+    public List<String> getSiguiendo() {
+        return siguiendo;
+    }
 
     /**
      * Retorna lista de conexiones (para compatibilidad con código existente y JSON)
      */
-    public List<String> getConexiones() { return conexiones; }
+    public List<String> getConexiones() {
+        return conexiones;
+    }
 
     /**
      * Obtiene todos los seguidores del grafo (nuevo método)
@@ -229,17 +243,33 @@ public class Cliente implements Comparable<Cliente> {
         return grafoALista(grafoConexiones);
     }
 
-    public List<String> getSolicitudesPendientes() { return solicitudesPendientes; }
-    public List<String> getHistorialPersonal() { return historialPersonal; }
+    public List<String> getSolicitudesPendientes() {
+        return solicitudesPendientes;
+    }
+
+    public List<String> getHistorialPersonal() {
+        return historialPersonal;
+    }
 
     @JsonIgnore
-    public ColaTDA<String> getSolicitudes() { return solicitudes; }
+    public ColaTDA<String> getSolicitudes() {
+        return solicitudes;
+    }
+
     @JsonIgnore
-    public PilaTDA<String> getHistorial() { return historial; }
+    public PilaTDA<String> getHistorial() {
+        return historial;
+    }
+
     @JsonIgnore
-    public GrafoTDA<String> getGrafoSiguiendo() { return grafoSiguiendo; }
+    public GrafoTDA<String> getGrafoSiguiendo() {
+        return grafoSiguiendo;
+    }
+
     @JsonIgnore
-    public GrafoTDA<String> getGrafoConexiones() { return grafoConexiones; }
+    public GrafoTDA<String> getGrafoConexiones() {
+        return grafoConexiones;
+    }
 
     @Override
     public boolean equals(Object o) {

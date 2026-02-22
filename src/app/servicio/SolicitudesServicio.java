@@ -1,11 +1,12 @@
 package app.servicio;
 
 import app.interfaces.ColaTDA;
+import app.modelo.Cliente;
 import app.modelo.Solicitud;
 import app.repositorio.ClienteRepositorio;
+
 import java.util.HashSet;
 import java.util.Set;
-import app.modelo.Cliente;
 
 public class SolicitudesServicio {
 
