@@ -107,6 +107,18 @@ public class Cliente implements Comparable<Cliente> {
     public void inicializarEstructurasDesdeJson() {
         if (solicitudes == null) inicializarTDAs();
 
+        if (this.nombre != null) {
+            this.grafoConexiones.AgregarVertice(this.nombre);
+        }
+
+        if (conexiones != null) {
+            for (String c : conexiones) {
+                this.grafoConexiones.AgregarVertice(c);
+                // Si es un grafo pesado, aquí pondrías el peso
+                this.grafoConexiones.AgregarArista(this.nombre, c, 1);
+            }
+        }
+
         // Cargar solicitudes en la cola
         if (solicitudesPendientes != null) {
             for (String s : solicitudesPendientes) {
@@ -152,7 +164,6 @@ public class Cliente implements Comparable<Cliente> {
         }
         this.historial = tempPila;
 
-        // Convertir grafos de vuelta a listas para persistencia
         this.siguiendo = grafoALista(this.grafoSiguiendo);
         this.conexiones = grafoALista(this.grafoConexiones);
     }

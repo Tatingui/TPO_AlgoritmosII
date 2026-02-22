@@ -9,6 +9,7 @@ import app.repositorio.ClienteRepositorio;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.File;
+import java.util.List;
 
 public class RedSocialManager {
     private final ClienteRepositorio repositorio;
@@ -83,22 +84,19 @@ public class RedSocialManager {
 
     public void guardarDatos(String ruta) {
         try {
-            // 1. Sincronizamos: Pasamos datos de los TDAs (Pila/Cola) a las Listas de Java
-            for (Cliente c : repositorio.obtenerTodos()) {
-                c.prepararParaGuardar(); // Usamos este que es el que tenés en Cliente.java
+            List<Cliente> todos = repositorio.obtenerTodos();
+            for (Cliente c : todos) {
+                c.prepararParaGuardar();
             }
 
-            // 2. Preparamos el contenedor que Jackson entiende
             Clientes wrapper = new Clientes();
-            wrapper.setClientes(repositorio.obtenerTodos());
+            wrapper.setClientes(todos);
 
-            // 3. Escribimos en el archivo físico
             JsonMapper mapper = new JsonMapper();
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File(ruta), wrapper);
-
-            System.out.println("[SISTEMA] Cambios guardados en: " + ruta);
+            System.out.println("[SISTEMA] Persistencia de grafos completada.");
         } catch (Exception e) {
-            System.err.println("[ERROR] No se pudo guardar el archivo: " + e.getMessage());
+            System.err.println("Error al guardar: " + e.getMessage());
         }
     }
 

@@ -1,0 +1,73 @@
+{
+  "clientes" : [ {
+    "conexiones" : [ "Sergio", "Bob", "Charlie" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Sergio",
+    "scoring" : 99,
+    "siguiendo" : [ "Bob", "Charlie" ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ ],
+    "historialPersonal" : [ ],
+    "nombre" : "Alice",
+    "scoring" : 95,
+    "siguiendo" : [ "Bob", "Charlie" ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "Matias", "Charlie", "Maria", "Alice" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Matias",
+    "scoring" : 93,
+    "siguiendo" : [ "Sergio", "Roberto" ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "David", "Bob", "Alice" ],
+    "historialPersonal" : [ ],
+    "nombre" : "David",
+    "scoring" : 92,
+    "siguiendo" : [ "Alice", "Bob" ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "Bob", "Alice", "David" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Bob",
+    "scoring" : 88,
+    "siguiendo" : [ "David" ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "Eve", "Charlie" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Eve",
+    "scoring" : 85,
+    "siguiendo" : [ ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "Juana", "Bob", "Alice" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Juana",
+    "scoring" : 83,
+    "siguiendo" : [ "Alice", "Matias" ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "Charlie", "Alice", "Eve" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Charlie",
+    "scoring" : 80,
+    "siguiendo" : [ ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "Roberto", "Alice", "Sergio" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Roberto",
+    "scoring" : 77,
+    "siguiendo" : [ "Sergio", "Eve" ],
+    "solicitudesPendientes" : [ ]
+  }, {
+    "conexiones" : [ "Maria", "Alice", "Eve", "Juana" ],
+    "historialPersonal" : [ ],
+    "nombre" : "Maria",
+    "scoring" : 75,
+    "siguiendo" : [ "Juana" ],
+    "solicitudesPendientes" : [ ]
+  } ]
+}
