@@ -32,7 +32,7 @@ public class SolicitudesServicio {
             return;
         }
 
-        if (clienteEmisor.getSiguiendo().size() >= 2) {
+        if (clienteEmisor.obtenerTodosSiguiendo().size() >= 2) {
             System.out.println("[!] Error: " + emisor + " ya sigue al máximo de 2 personas.");
             clienteEmisor.getHistorial().Apilar("Intento fallido de seguir a " + receptor + " (Límite 2)");
             return;

@@ -139,4 +139,61 @@ class ClienteRepositorioTest {
         assertNotNull(encontrado, "Debe encontrar Cliente50");
         assertEquals(50, encontrado.getScoring(), "Cliente50 debe tener scoring 50");
     }
+
+    @Test
+    @DisplayName("Agregar seguidor usando grafo")
+    void testAgregarSeguidor() {
+        Cliente c1 = new Cliente("Alice", 90, new ArrayList<>(), new ArrayList<>());
+        c1.inicializarEstructurasDesdeJson(); // Necesario para inicializar el grafo
+
+        c1.agregarSeguidor("Bob");
+
+        var siguiendo = c1.obtenerTodosSiguiendo();
+        assertTrue(siguiendo.contains("Bob"), "Alice debe seguir a Bob en el grafo");
+    }
+
+    @Test
+    @DisplayName("Agregar conexión bidireccional usando grafo")
+    void testAgregarConexion() {
+        Cliente c1 = new Cliente("Alice", 90, new ArrayList<>(), new ArrayList<>());
+        c1.inicializarEstructurasDesdeJson();
+
+        c1.agregarConexion("Bob");
+
+        var conexiones = c1.obtenerTodasConexiones();
+        assertTrue(conexiones.contains("Bob"), "Alice debe tener conexión con Bob");
+    }
+
+    @Test
+    @DisplayName("Sincronización JSON → Grafo al cargar")
+    void testSincronizacionJsonAGrafo() {
+        ArrayList<String> siguiendo = new ArrayList<>();
+        siguiendo.add("Bob");
+        siguiendo.add("Charlie");
+
+        Cliente c = new Cliente("Alice", 90, siguiendo, new ArrayList<>());
+        c.inicializarEstructurasDesdeJson();
+
+        var siguiendoDelGrafo = c.obtenerTodosSiguiendo();
+        assertEquals(2, siguiendoDelGrafo.size(), "El grafo debe contener 2 seguidores");
+        assertTrue(siguiendoDelGrafo.contains("Bob"), "El grafo debe contener Bob");
+        assertTrue(siguiendoDelGrafo.contains("Charlie"), "El grafo debe contener Charlie");
+    }
+
+    @Test
+    @DisplayName("Sincronización Grafo → JSON al guardar")
+    void testSincronizacionGrafoAJson() {
+        Cliente c = new Cliente("Alice", 90, new ArrayList<>(), new ArrayList<>());
+        c.inicializarEstructurasDesdeJson();
+
+        c.agregarSeguidor("Bob");
+        c.agregarSeguidor("Charlie");
+
+        c.prepararParaGuardar();
+
+        var siguiendo = c.getSiguiendo();
+        assertEquals(2, siguiendo.size(), "La lista debe contener 2 elementos");
+        assertTrue(siguiendo.contains("Bob"), "La lista debe contener Bob");
+        assertTrue(siguiendo.contains("Charlie"), "La lista debe contener Charlie");
+    }
 }
