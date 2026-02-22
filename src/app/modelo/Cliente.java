@@ -115,11 +115,13 @@ public class Cliente implements Comparable<Cliente> {
         return new HashCodeBuilder(17, 37).append(getNombre()).append(getScoring()).toHashCode();
     }
 
-
     @Override
     public int compareTo(Cliente o) {
-        // Orden descendente: clientes con mayor scoring son "menores"
-        // para que el ABB InOrder los muestre de mayor a menor
-        return o.scoring.compareTo(this.scoring);
+        // Orden descendente por scoring
+        int cmp = o.scoring.compareTo(this.scoring);
+        if (cmp != 0) return cmp;
+
+        // Desempate por nombre para que no se pierdan clientes con igual scoring en el ABB
+        return this.nombre.compareToIgnoreCase(o.nombre);
     }
 }

@@ -46,6 +46,9 @@ public class Main {
             System.out.println("7) Ver próxima solicitud en cola");
             System.out.println("8) Aceptar próxima solicitud");
             System.out.println("9) Rechazar próxima solicitud");
+            System.out.println("\n=== ITERACION 2 ===");
+            System.out.println("10) Consultar conexiones de un cliente");
+            System.out.println("11) Mostrar cuarto nivel ABB de conexiones de un cliente");
             System.out.println("0) Guardar cambios y salir");
             System.out.print("Seleccione una opción: ");
 
@@ -155,12 +158,24 @@ public class Main {
                             System.out.println("No hay solicitudes para rechazar.");
                         }
                     }
+                    case "10" -> {
+                        System.out.print("Ingrese nombre del cliente: ");
+                        String nombre = sc.nextLine().trim();
+                        manager.consultarConexionesDeCliente(nombre);
+                    }
+
+                    case "11" -> {
+                        System.out.print("Ingrese nombre del cliente: ");
+                        String nombre = sc.nextLine().trim();
+                        manager.mostrarCuartoNivelABBDeConexiones(nombre);
+                    }
 
                     case "0" -> {
                         System.out.println("Guardando datos antes de salir...");
                         manager.guardarDatos("clientes.json");
                         salir = true;
                     }
+
                 }
             } catch (Exception e) {
                 System.out.println("Ocurrió un error: " + e.getMessage());
