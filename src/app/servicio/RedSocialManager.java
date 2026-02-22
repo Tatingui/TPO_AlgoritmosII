@@ -5,6 +5,9 @@ import app.modelo.Clientes;
 import app.persistencia.JsonLoader;
 import app.repositorio.ClienteRepositorio;
 import tools.jackson.databind.json.JsonMapper;
+import app.implementaciones.ABB;
+import app.interfaces.ABBTDA;
+import app.modelo.Cliente;
 
 import java.io.File;
 
@@ -35,15 +38,22 @@ public class RedSocialManager {
     }
 
     public void cargarDesdeArchivo(String ruta) {
-        if (ruta == null) throw new IllegalArgumentException("Ruta nula");
-        Clientes wrapper = loader.cargarClientes(ruta);
-
-        if (wrapper != null && wrapper.getClientes() != null) {
-            for (Cliente c : wrapper.getClientes()) {
+        if (ruta == null) {
+            throw new IllegalArgumentException("La ruta para cargar JSON no existe");
+        }
+        Clientes clientesNuevos = loader.cargarClientes(ruta);
+        if (clientesNuevos != null) {
+            for (Cliente c : clientesNuevos.getClientes()) {
                 repositorio.guardarCliente(c);
             }
-            System.out.println("LOG: Carga de clientes completada");
-            System.out.println("[LOG] Carga exitosa: " + wrapper.getClientes().size() + " clientes insertados en el ABB.");
+            System.out.println("LOG: Carga de clientes completada.");
+        }
+        if (clientesNuevos != null) {
+            for (Cliente c : clientesNuevos.getClientes()) {
+                // ¡ESTA LÍNEA ES VITAL!
+                c.inicializarEstructurasDesdeJson();
+                repositorio.guardarCliente(c);
+            }
         }
     }
 
@@ -91,5 +101,92 @@ public class RedSocialManager {
         } catch (Exception e) {
             System.err.println("[ERROR] No se pudo guardar el archivo: " + e.getMessage());
         }
+    }
+
+    public void consultarConexionesDeCliente(String nombreCliente) {
+        if (nombreCliente == null || nombreCliente.isBlank()) {
+            System.out.println("Nombre inválido.");
+            return;
+        }
+
+        Cliente cliente = repositorio.buscarPorNombre(nombreCliente);
+
+        if (cliente == null) {
+            System.out.println("No existe el cliente: " + nombreCliente);
+            return;
+        }
+
+        if (cliente.getSiguiendo() == null || cliente.getSiguiendo().isEmpty()) {
+            System.out.println(cliente.getNombre() + " no sigue a nadie.");
+            return;
+        }
+
+        System.out.println("Conexiones de " + cliente.getNombre() + " (a quiénes sigue):");
+
+        for (String nombreSeguido : cliente.getSiguiendo()) {
+            Cliente seguido = repositorio.buscarPorNombre(nombreSeguido);
+
+            if (seguido != null) {
+                System.out.println("- " + seguido.getNombre() + " (scoring: " + seguido.getScoring() + ")");
+            } else {
+                // por si hay nombres en JSON que ya no existen en el repo
+                System.out.println("- " + nombreSeguido + " (no encontrado en repositorio)");
+            }
+        }
+    }
+    public void mostrarCuartoNivelABBDeConexiones(String nombreCliente) {
+        if (nombreCliente == null || nombreCliente.isBlank()) {
+            System.out.println("Nombre inválido.");
+            return;
+        }
+
+        Cliente cliente = repositorio.buscarPorNombre(nombreCliente);
+        if (cliente == null) {
+            System.out.println("No existe el cliente: " + nombreCliente);
+            return;
+        }
+
+        if (cliente.getSiguiendo() == null || cliente.getSiguiendo().isEmpty()) {
+            System.out.println(cliente.getNombre() + " no sigue a nadie.");
+            return;
+        }
+
+        ABB<Cliente> arbol = new ABB<>();
+        arbol.InicializarArbol();
+
+        // Cargar en ABB los clientes que sigue
+        for (String nombreSeguido : cliente.getSiguiendo()) {
+            Cliente seguido = repositorio.buscarPorNombre(nombreSeguido);
+            if (seguido != null) {
+                arbol.AgregarElem(seguido);
+            }
+        }
+
+        System.out.println("Clientes seguidos por " + cliente.getNombre() + " cargados en ABB.");
+        System.out.println("Clientes en el CUARTO nivel del ABB (nivel 3):");
+
+        boolean hayNodos = imprimirNivelABB(arbol, 3);
+
+        if (!hayNodos) {
+            System.out.println("(No hay nodos en el cuarto nivel)");
+        }
+    }
+    private boolean imprimirNivelABB(ABBTDA<Cliente> arbol, int nivelObjetivo) {
+        return imprimirNivelABBRec(arbol, 0, nivelObjetivo);
+    }
+
+    private boolean imprimirNivelABBRec(ABBTDA<Cliente> nodo, int nivelActual, int nivelObjetivo) {
+        if (nodo == null || nodo.ArbolVacio()) return false;
+
+        if (nivelActual == nivelObjetivo) {
+            Cliente c = nodo.Raiz();
+            System.out.println("- " + c.getNombre() + " (scoring: " + c.getScoring() + ")");
+            return true;
+        }
+
+        boolean izq = imprimirNivelABBRec(nodo.HijoIzq(), nivelActual + 1, nivelObjetivo);
+        boolean der = imprimirNivelABBRec(nodo.HijoDer(), nivelActual + 1, nivelObjetivo);
+
+        return izq || der;
     }
 }

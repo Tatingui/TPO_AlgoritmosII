@@ -1,73 +1,73 @@
 {
   "clientes" : [ {
-    "conexiones" : [ "Bob", "Charlie" ],
-    "historialPersonal" : [ "Aceptaste la solicitud de: Eve" ],
-    "nombre" : "Sergio",
-    "scoring" : 99,
-    "siguiendo" : [ "Bob", "Charlie" ],
-    "solicitudesPendientes" : [ ]
-  }, {
     "conexiones" : [ "Bob", "Charlie", "David" ],
-    "historialPersonal" : [ ],
+    "historial_personal" : [ ],
     "nombre" : "Alice",
     "scoring" : 95,
     "siguiendo" : [ "Bob", "Charlie" ],
-    "solicitudesPendientes" : [ ]
-  }, {
-    "conexiones" : [ "Charlie", "Maria", "Alice" ],
-    "historialPersonal" : [ ],
-    "nombre" : "Matias",
-    "scoring" : 93,
-    "siguiendo" : [ "Sergio", "Roberto" ],
-    "solicitudesPendientes" : [ ]
-  }, {
-    "conexiones" : [ "Bob", "Alice" ],
-    "historialPersonal" : [ ],
-    "nombre" : "David",
-    "scoring" : 92,
-    "siguiendo" : [ "Alice", "Bob" ],
-    "solicitudesPendientes" : [ ]
+    "solicitudes_pendientes" : [ ]
   }, {
     "conexiones" : [ "Alice", "David" ],
-    "historialPersonal" : [ ],
+    "historial_personal" : [ ],
     "nombre" : "Bob",
     "scoring" : 88,
     "siguiendo" : [ "David" ],
-    "solicitudesPendientes" : [ ]
-  }, {
-    "conexiones" : [ "Charlie" ],
-    "historialPersonal" : [ "Envio solicitud a Sergio", "Ahora sigues a: Sergio" ],
-    "nombre" : "Eve",
-    "scoring" : 85,
-    "siguiendo" : [ "Sergio" ],
-    "solicitudesPendientes" : [ ]
-  }, {
-    "conexiones" : [ "Bob", "Alice" ],
-    "historialPersonal" : [ ],
-    "nombre" : "Juana",
-    "scoring" : 83,
-    "siguiendo" : [ "Alice", "Matias" ],
-    "solicitudesPendientes" : [ ]
+    "solicitudes_pendientes" : [ ]
   }, {
     "conexiones" : [ "Alice", "Eve" ],
-    "historialPersonal" : [ ],
+    "historial_personal" : [ ],
     "nombre" : "Charlie",
     "scoring" : 80,
     "siguiendo" : [ ],
-    "solicitudesPendientes" : [ ]
+    "solicitudes_pendientes" : [ ]
+  }, {
+    "conexiones" : [ "Bob", "Alice" ],
+    "historial_personal" : [ ],
+    "nombre" : "David",
+    "scoring" : 92,
+    "siguiendo" : [ "Alice", "Bob" ],
+    "solicitudes_pendientes" : [ ]
+  }, {
+    "conexiones" : [ "Charlie" ],
+    "historial_personal" : [ ],
+    "nombre" : "Eve",
+    "scoring" : 85,
+    "siguiendo" : [ ],
+    "solicitudes_pendientes" : [ ]
+  }, {
+    "conexiones" : [ "Bob", "Charlie" ],
+    "historial_personal" : [ ],
+    "nombre" : "Sergio",
+    "scoring" : 99,
+    "siguiendo" : [ "Bob", "Charlie" ],
+    "solicitudes_pendientes" : [ ]
   }, {
     "conexiones" : [ "Alice", "Sergio" ],
-    "historialPersonal" : [ ],
+    "historial_personal" : [ "Rechazaste solicitud de: Maria" ],
     "nombre" : "Roberto",
     "scoring" : 77,
     "siguiendo" : [ "Sergio", "Eve" ],
-    "solicitudesPendientes" : [ ]
+    "solicitudes_pendientes" : [ ]
   }, {
     "conexiones" : [ "Alice", "Eve", "Juana" ],
-    "historialPersonal" : [ ],
+    "historial_personal" : [ "Envio solicitud a Roberto" ],
     "nombre" : "Maria",
     "scoring" : 75,
     "siguiendo" : [ "Juana" ],
-    "solicitudesPendientes" : [ ]
+    "solicitudes_pendientes" : [ ]
+  }, {
+    "conexiones" : [ "Bob", "Alice" ],
+    "historial_personal" : [ ],
+    "nombre" : "Juana",
+    "scoring" : 83,
+    "siguiendo" : [ "Alice", "Matias" ],
+    "solicitudes_pendientes" : [ ]
+  }, {
+    "conexiones" : [ "Charlie", "Maria", "Alice" ],
+    "historial_personal" : [ ],
+    "nombre" : "Matias",
+    "scoring" : 93,
+    "siguiendo" : [ "Sergio", "Roberto" ],
+    "solicitudes_pendientes" : [ ]
   } ]
 }
