@@ -34,7 +34,7 @@ class RedSocialManagerTest {
         @DisplayName("Cargar clientes desde archivo JSON válido")
         void testCargarArchivoValido() {
             capturedOutput.reset(); // Limpiamos lo que puso el constructor
-            redSocialManager.cargarDesdeArchivo("clientes.json");
+            redSocialManager.cargarDesdeArchivo("Clientes.json");
             String output = capturedOutput.toString();
             assertTrue(output.contains("LOG: Carga de clientes completada"), "Debe encontrar el mensaje de confirmación");
         }
