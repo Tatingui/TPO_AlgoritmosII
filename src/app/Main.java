@@ -35,7 +35,7 @@ public class Main {
         System.out.println("======================================");
 
         while (!salir) {
-            System.out.println("\n=== MENÚ PRINCIPAL ===");
+            System.out.println("\n=== ITERACION 1 ===");
             System.out.println("1) Buscar cliente por nombre");
             System.out.println("2) Buscar clientes por scoring");
             System.out.println("3) Mostrar ranking completo (Prioridad)");
@@ -49,6 +49,9 @@ public class Main {
             System.out.println("\n=== ITERACION 2 ===");
             System.out.println("10) Consultar conexiones de un cliente");
             System.out.println("11) Mostrar cuarto nivel ABB de conexiones de un cliente");
+            System.out.println("\n=== ITERACION 3 ===");
+            System.out.println("12) Calcular distancia entre clientes (saltos)");
+
             System.out.println("0) Guardar cambios y salir");
             System.out.print("Seleccione una opción: ");
 
@@ -168,7 +171,16 @@ public class Main {
                         System.out.print("Ingrese nombre del cliente: ");
                         String nombre = sc.nextLine().trim();
                         manager.mostrarCuartoNivelABBDeConexiones(nombre);
+
+                    }case "12" -> {
+                        System.out.print("Cliente origen: ");
+                        String origen = sc.nextLine().trim();
+                        System.out.print("Cliente destino: ");
+                        String destino = sc.nextLine().trim();
+
+                        manager.calcularDistanciaEntreClientes(origen, destino);
                     }
+
 
                     case "0" -> {
                         System.out.println("Guardando datos antes de salir...");

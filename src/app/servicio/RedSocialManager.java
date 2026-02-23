@@ -1,5 +1,8 @@
 package app.servicio;
 
+import app.implementaciones.GrafoLA;
+import app.interfaces.ConjuntoTDA;
+import app.interfaces.GrafoTDA;
 import app.modelo.Cliente;
 import app.modelo.Clientes;
 import app.persistencia.JsonLoader;
@@ -10,6 +13,7 @@ import app.interfaces.ABBTDA;
 import app.modelo.Cliente;
 
 import java.io.File;
+import java.util.*;
 
 public class RedSocialManager {
     private final ClienteRepositorio repositorio;
@@ -18,11 +22,16 @@ public class RedSocialManager {
     private final HistorialServicio historialServicio;
     private final SolicitudesServicio solicitudesServicio;
 
+    private final GrafoTDA<Cliente> grafoSeguimientos;
+
     public RedSocialManager() {
         this.repositorio = new ClienteRepositorio();
         this.loader = new JsonLoader();
         this.historialServicio = new HistorialServicio();
         this.solicitudesServicio = new SolicitudesServicio();
+
+        this.grafoSeguimientos = new GrafoLA<>();
+        this.grafoSeguimientos.InicializarGrafo();
 
         System.out.println("[SISTEMA] Iniciando Red Social...");
         inicializarDatos();
@@ -189,4 +198,102 @@ public class RedSocialManager {
 
         return izq || der;
     }
+
+    public void calcularDistanciaEntreClientes(String nombreOrigen, String nombreDestino) {
+        if (nombreOrigen == null || nombreOrigen.isBlank() ||
+                nombreDestino == null || nombreDestino.isBlank()) {
+            System.out.println("Nombres inválidos.");
+            return;
+        }
+        reconstruirGrafoSeguimientos();
+        Cliente origen = repositorio.buscarPorNombre(nombreOrigen);
+        Cliente destino = repositorio.buscarPorNombre(nombreDestino);
+
+        if (origen == null || destino == null) {
+            System.out.println("Uno o ambos clientes no existen.");
+            return;
+        }
+
+        int distancia = distanciaEnSaltos(origen, destino);
+
+        if (distancia == -1) {
+            System.out.println("No hay conexión entre " + origen.getNombre() + " y " + destino.getNombre() + ".");
+        } else {
+            System.out.println("Distancia entre " + origen.getNombre() + " y " + destino.getNombre() +
+                    ": " + distancia + " salto(s).");
+        }
+    }
+
+    private int distanciaEnSaltos(Cliente origen, Cliente destino) {
+        if (origen.equals(destino)) return 0;
+
+        // Obtener todos los vértices una vez
+        List<Cliente> vertices = obtenerVerticesComoLista();
+
+        Queue<Cliente> cola = new LinkedList<>();
+        Map<Cliente, Integer> distancia = new HashMap<>();
+        Set<Cliente> visitados = new HashSet<>();
+
+        cola.add(origen);
+        visitados.add(origen);
+        distancia.put(origen, 0);
+
+        while (!cola.isEmpty()) {
+            Cliente actual = cola.poll();
+            int distActual = distancia.get(actual);
+
+            // "Vecinos" = todos los vértices a los que actual tiene arista
+            for (Cliente candidato : vertices) {
+                if (!visitados.contains(candidato) && grafoSeguimientos.ExisteArista(actual, candidato)) {
+                    visitados.add(candidato);
+                    distancia.put(candidato, distActual + 1);
+
+                    if (candidato.equals(destino)) {
+                        return distActual + 1;
+                    }
+
+                    cola.add(candidato);
+                }
+            }
+        }
+
+        return -1; // no hay camino
+    }
+    private List<Cliente> obtenerVerticesComoLista() {
+        List<Cliente> lista = new ArrayList<>();
+
+        // OJO: Vertices() devuelve ConjuntoTDA<Cliente>.
+        // Lo vaciamos para copiar a una lista temporal y luego usar BFS con Java collections.
+        ConjuntoTDA<Cliente> vertices = grafoSeguimientos.Vertices();
+
+        while (!vertices.ConjuntoVacio()) {
+            Cliente c = vertices.Elegir(); // misma referencia que está en el grafo
+            lista.add(c);
+            vertices.Sacar(c); // funciona porque Sacar usa referencia (==)
+        }
+
+        return lista;
+    }
+
+    private void reconstruirGrafoSeguimientos() {
+        grafoSeguimientos.InicializarGrafo();
+
+        // 1) Vértices
+        for (Cliente c : repositorio.obtenerTodos()) {
+            grafoSeguimientos.AgregarVertice(c);
+        }
+
+        // 2) Aristas: seguidor -> seguido
+        for (Cliente seguidor : repositorio.obtenerTodos()) {
+            if (seguidor.getSiguiendo() == null) continue;
+
+            for (String nombreSeguido : seguidor.getSiguiendo()) {
+                Cliente seguido = repositorio.buscarPorNombre(nombreSeguido);
+                if (seguido != null && !grafoSeguimientos.ExisteArista(seguidor, seguido)) {
+                    grafoSeguimientos.AgregarArista(seguidor, seguido, 1);
+                }
+            }
+        }
+    }
+
 }
