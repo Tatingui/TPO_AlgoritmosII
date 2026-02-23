@@ -3,8 +3,7 @@
     {
       "conexiones": [
         "Bob",
-        "Charlie",
-        "David"
+        "Charlie"
       ],
       "historial_personal": [],
       "nombre": "Alice",
@@ -36,7 +35,9 @@
       "historial_personal": [],
       "nombre": "Charlie",
       "scoring": 80,
-      "siguiendo": [],
+      "siguiendo": [
+        "Matias"
+      ],
       "solicitudes_pendientes": []
     },
     {
@@ -60,7 +61,9 @@
       "historial_personal": [],
       "nombre": "Eve",
       "scoring": 85,
-      "siguiendo": [],
+      "siguiendo": [
+        "Juana"
+      ],
       "solicitudes_pendientes": []
     },
     {
@@ -96,8 +99,7 @@
     {
       "conexiones": [
         "Alice",
-        "Eve",
-        "Juana"
+        "Eve"
       ],
       "historial_personal": [
         "Envio solicitud a Roberto"
@@ -126,8 +128,7 @@
     {
       "conexiones": [
         "Charlie",
-        "Maria",
-        "Alice"
+        "Maria"
       ],
       "historial_personal": [],
       "nombre": "Matias",
