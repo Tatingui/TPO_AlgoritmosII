@@ -1,11 +1,12 @@
 package app.servicio;
 
 import app.interfaces.ColaTDA;
+import app.modelo.Cliente;
 import app.modelo.Solicitud;
 import app.repositorio.ClienteRepositorio;
+
 import java.util.HashSet;
 import java.util.Set;
-import app.modelo.Cliente;
 
 public class SolicitudesServicio {
 
@@ -32,7 +33,7 @@ public class SolicitudesServicio {
             return;
         }
 
-        if (clienteEmisor.getSiguiendo().size() >= 2) {
+        if (clienteEmisor.obtenerTodosSiguiendo().size() >= 2) {
             System.out.println("[!] Error: " + emisor + " ya sigue al máximo de 2 personas.");
             clienteEmisor.getHistorial().Apilar("Intento fallido de seguir a " + receptor + " (Límite 2)");
             return;
